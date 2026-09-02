@@ -62,13 +62,13 @@ export default function Home() {
             <h1 className="text-lg font-semibold text-slate-900">Dashboard</h1>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 transition-colors"
+            <Link
+              href="/calls/upload"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-md text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2"
             >
               <FileAudio className="h-4 w-4" />
               Upload Call
-            </button>
+            </Link>
           </div>
         </header>
 
@@ -104,8 +104,8 @@ export default function Home() {
                 </p>
               </div>
               <Link
-                href="#"
-                className="text-xs font-medium text-slate-600 hover:text-slate-900 inline-flex items-center gap-1"
+                href="/calls"
+                className="text-xs font-medium text-slate-600 hover:text-slate-900 inline-flex items-center gap-1 focus-visible:outline-none focus-visible:underline"
               >
                 View all calls
                 <ArrowUpRight className="h-3 w-3" />
