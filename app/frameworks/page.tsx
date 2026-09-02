@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/layout/sidebar";
+import { Topbar } from "@/components/layout/topbar";
 import { getFrameworksAction } from "@/app/actions/frameworks";
 import { FrameworkList } from "@/components/frameworks/framework-list";
 import { GitFork, CheckCircle2, Layers } from "lucide-react";
@@ -13,76 +14,79 @@ export default async function FrameworksPage() {
   const activeFrameworks = frameworks.filter((f) => f.active).length;
   const totalStages = frameworks.reduce((acc, f) => acc + f.stages_count, 0);
 
+  const statCards = [
+    {
+      name: "Total Frameworks",
+      value: totalFrameworks,
+      sub: "Defined call playbooks",
+      icon: GitFork,
+      bg: "bg-indigo-50 text-indigo-600",
+    },
+    {
+      name: "Active Playbooks",
+      value: activeFrameworks,
+      sub: "Ready for call scoring",
+      icon: CheckCircle2,
+      bg: "bg-emerald-50 text-emerald-600",
+    },
+    {
+      name: "Configured Stages",
+      value: totalStages,
+      sub: "Total across frameworks",
+      icon: Layers,
+      bg: "bg-cyan-50 text-cyan-600",
+    },
+  ];
+
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-100">
+    <div className="flex min-h-screen bg-neutral-100 text-neutral-800">
+      {/* Admina Twin Sidebar */}
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Header */}
-        <header className="h-16 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md flex items-center px-8 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300">
-              <GitFork className="h-4 w-4 text-indigo-400" />
-            </div>
-            <div>
-              <h1 className="text-base font-semibold text-white tracking-tight">
-                Call Frameworks
-              </h1>
-              <p className="text-[11px] text-slate-400">
-                Conversation structures, weighted stages & QA evaluation rubrics
-              </p>
-            </div>
-          </div>
-        </header>
+        {/* Admina Topbar */}
+        <Topbar />
 
         {/* Content */}
-        <div className="p-8 space-y-6 flex-1">
-          {/* Metric Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-                  Total Frameworks
-                </span>
-                <div className="h-8 w-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-300">
-                  <GitFork className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="mt-2 text-2xl font-bold font-mono text-white tabular-nums">
-                {totalFrameworks}
-              </div>
-              <p className="text-xs text-slate-400 mt-0.5">Defined call playbooks</p>
-            </div>
+        <div className="p-8 space-y-7 flex-1">
+          {/* Header */}
+          <div>
+            <h1 className="text-xl font-bold text-neutral-900 tracking-tight">
+              Call Frameworks
+            </h1>
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Define required conversation structures, weighted stages, and checklist requirements for automated QA scoring.
+            </p>
+          </div>
 
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-                  Active Frameworks
-                </span>
-                <div className="h-8 w-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-emerald-400">
-                  <CheckCircle2 className="h-4 w-4" />
+          {/* Admina Stat Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            {statCards.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div
+                  key={stat.name}
+                  className="bg-white border border-neutral-200/90 rounded-2xl p-6 shadow-xs hover:shadow-md transition-shadow flex items-center gap-4"
+                >
+                  <div
+                    className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 ${stat.bg} shadow-xs`}
+                  >
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block">
+                      {stat.name}
+                    </span>
+                    <div className="mt-1 text-2xl font-bold text-neutral-900 tabular-nums">
+                      {stat.value}
+                    </div>
+                    <span className="text-[11px] text-neutral-400 font-medium">
+                      {stat.sub}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-2 text-2xl font-bold font-mono text-emerald-400 tabular-nums">
-                {activeFrameworks}
-              </div>
-              <p className="text-xs text-slate-400 mt-0.5">Ready for call scoring</p>
-            </div>
-
-            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 shadow-sm backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-                  Configured Stages
-                </span>
-                <div className="h-8 w-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-cyan-400">
-                  <Layers className="h-4 w-4" />
-                </div>
-              </div>
-              <div className="mt-2 text-2xl font-bold font-mono text-white tabular-nums">
-                {totalStages}
-              </div>
-              <p className="text-xs text-slate-400 mt-0.5">Total across playbooks</p>
-            </div>
+              );
+            })}
           </div>
 
           {/* List Component */}

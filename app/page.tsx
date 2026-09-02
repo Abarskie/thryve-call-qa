@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { Sidebar } from "@/components/layout/sidebar";
+import { Topbar } from "@/components/layout/topbar";
 import {
   ArrowUpRight,
   CheckCircle2,
   AlertCircle,
   FileAudio,
-  Activity,
   TrendingUp,
+  Activity,
   Users2,
   ShieldAlert,
 } from "lucide-react";
@@ -16,26 +17,29 @@ export default function Home() {
     {
       name: "Average Call Score",
       value: "82%",
-      change: "+3.2% this week",
+      change: "+3.2%",
       trend: "up",
+      period: "vs last week",
       icon: TrendingUp,
-      accent: "from-emerald-500/20 to-transparent",
+      bg: "bg-indigo-50 text-indigo-600",
     },
     {
       name: "Calls Analyzed",
       value: "126",
-      change: "+18 this week",
+      change: "+18",
       trend: "up",
+      period: "this week",
       icon: Activity,
-      accent: "from-indigo-500/20 to-transparent",
+      bg: "bg-emerald-50 text-emerald-600",
     },
     {
       name: "Active Sales Agents",
       value: "12",
-      change: "4 monitored today",
-      trend: "neutral",
+      change: "+2 new",
+      trend: "up",
+      period: "monitored",
       icon: Users2,
-      accent: "from-cyan-500/20 to-transparent",
+      bg: "bg-cyan-50 text-cyan-600",
     },
   ];
 
@@ -75,121 +79,136 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-100">
-      {/* Sidebar Navigation */}
+    <div className="flex min-h-screen bg-neutral-100 text-neutral-800">
+      {/* Admina Twin Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Command Center Top Bar */}
-        <header className="h-16 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md flex items-center justify-between px-8 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <h1 className="text-base font-semibold text-white tracking-tight">
-              QA Command Center
-            </h1>
-            <span className="hidden sm:inline-flex items-center text-xs font-mono text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
-              LIVE MONITORING
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/calls/upload"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
-            >
-              <FileAudio className="h-4 w-4" />
-              Upload Call
-            </Link>
-          </div>
-        </header>
+        {/* Admina Topbar */}
+        <Topbar />
 
         {/* Page Content */}
-        <div className="p-8 space-y-8 flex-1">
-          {/* Key Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="p-8 space-y-7 flex-1">
+          {/* Page Title & Action Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-xl font-bold text-neutral-900 tracking-tight">
+                Dashboard Overview
+              </h1>
+              <p className="text-xs text-neutral-500 mt-0.5">
+                Real-time sales call QA scoring, compliance monitoring & coaching insights
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <Link
+                href="/calls/upload"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-200 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+              >
+                <FileAudio className="h-4 w-4" />
+                Upload Call Recording
+              </Link>
+            </div>
+          </div>
+
+          {/* Admina Stat Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {stats.map((stat) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={stat.name}
-                  className="relative overflow-hidden bg-slate-900/60 border border-slate-800/80 rounded-xl p-6 shadow-sm backdrop-blur-sm hover:border-slate-700/80 transition-all group"
+                  className="bg-white border border-neutral-200/90 rounded-2xl p-6 shadow-xs hover:shadow-md transition-shadow flex items-center justify-between"
                 >
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${stat.accent} opacity-50 pointer-events-none`}
-                  />
-                  <div className="relative flex items-center justify-between">
-                    <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
-                      {stat.name}
-                    </span>
-                    <div className="h-8 w-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-300 group-hover:scale-105 transition-transform">
-                      <Icon className="h-4 w-4" />
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 ${stat.bg} shadow-xs`}
+                    >
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block">
+                        {stat.name}
+                      </span>
+                      <div className="mt-1 text-2xl font-bold text-neutral-900 tabular-nums">
+                        {stat.value}
+                      </div>
+                      <span className="text-[11px] text-neutral-400 font-medium">
+                        {stat.period}
+                      </span>
                     </div>
                   </div>
-                  <div className="relative mt-3 flex items-baseline gap-2">
-                    <span className="text-3xl font-bold tracking-tight text-white tabular-nums font-mono">
-                      {stat.value}
-                    </span>
-                  </div>
-                  <p className="relative mt-1 text-xs text-slate-400 font-medium">
+
+                  {/* Trend Pill Badge */}
+                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <TrendingUp className="h-3 w-3" />
                     {stat.change}
-                  </p>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Recent Calls Section */}
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl shadow-sm overflow-hidden backdrop-blur-sm">
-            <div className="px-6 py-4 border-b border-slate-800/80 flex items-center justify-between">
+          {/* Recent Evaluated Calls Table */}
+          <div className="bg-white border border-neutral-200/90 rounded-2xl shadow-xs overflow-hidden">
+            <div className="px-6 py-5 border-b border-neutral-100 flex items-center justify-between">
               <div>
-                <h2 className="text-sm font-semibold text-white">Recent Evaluated Calls</h2>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Real-time compliance evaluations and AI framework scores
+                <h2 className="text-sm font-bold text-neutral-900">
+                  Recent Evaluated Calls
+                </h2>
+                <p className="text-xs text-neutral-400 mt-0.5">
+                  Latest agent recordings evaluated against quality frameworks
                 </p>
               </div>
               <Link
                 href="/calls"
-                className="text-xs font-medium text-slate-400 hover:text-white inline-flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:underline"
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:underline"
               >
                 View all calls
-                <ArrowUpRight className="h-3 w-3" />
+                <ArrowUpRight className="h-3.5 w-3.5" />
               </Link>
             </div>
 
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-sm">
+              <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 bg-slate-950/60 text-slate-400 text-[11px] font-mono uppercase tracking-wider">
-                    <th className="py-3 px-6">Agent</th>
-                    <th className="py-3 px-6">Framework</th>
-                    <th className="py-3 px-6">Date</th>
-                    <th className="py-3 px-6">QA Score</th>
-                    <th className="py-3 px-6">Status</th>
+                  <tr className="border-b border-neutral-200 bg-neutral-50/75 text-neutral-500 font-semibold uppercase tracking-wider">
+                    <th className="py-3.5 px-6">Agent</th>
+                    <th className="py-3.5 px-6">Framework</th>
+                    <th className="py-3.5 px-6">Date</th>
+                    <th className="py-3.5 px-6">QA Score</th>
+                    <th className="py-3.5 px-6">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-neutral-100 text-neutral-700">
                   {recentCalls.map((call) => (
                     <tr
                       key={call.id}
-                      className="hover:bg-slate-800/30 transition-colors group"
+                      className="hover:bg-neutral-50/70 transition-colors group"
                     >
-                      <td className="py-3.5 px-6 font-medium text-white flex items-center gap-2.5">
-                        <div className="h-7 w-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-slate-300 font-semibold">
+                      <td className="py-3.5 px-6 font-medium text-neutral-900 flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-xs text-neutral-700 font-bold">
                           {call.agent.charAt(0)}
                         </div>
-                        {call.agent}
+                        <span className="font-semibold text-neutral-800">
+                          {call.agent}
+                        </span>
                       </td>
-                      <td className="py-3.5 px-6 text-slate-300">{call.framework}</td>
-                      <td className="py-3.5 px-6 text-slate-400 text-xs">{call.date}</td>
+                      <td className="py-3.5 px-6 text-neutral-600 font-medium">
+                        {call.framework}
+                      </td>
+                      <td className="py-3.5 px-6 text-neutral-400 text-xs">
+                        {call.date}
+                      </td>
                       <td className="py-3.5 px-6 font-semibold">
                         <span
-                          className={`font-mono tabular-nums ${
+                          className={`tabular-nums text-sm font-bold ${
                             call.score >= 80
-                              ? "text-emerald-400"
+                              ? "text-emerald-600"
                               : call.score >= 70
-                              ? "text-amber-400"
-                              : "text-rose-400"
+                              ? "text-amber-600"
+                              : "text-rose-600"
                           }`}
                         >
                           {call.score}%
@@ -197,22 +216,22 @@ export default function Home() {
                       </td>
                       <td className="py-3.5 px-6">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium font-mono ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
                             call.status === "PASS"
-                              ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800/60"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : call.status === "PARTIAL"
-                              ? "bg-amber-950/80 text-amber-300 border border-amber-800/60"
-                              : "bg-rose-950/80 text-rose-300 border border-rose-800/60"
+                              ? "bg-amber-50 text-amber-700 border border-amber-200"
+                              : "bg-rose-50 text-rose-700 border border-rose-200"
                           }`}
                         >
                           {call.status === "PASS" && (
-                            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                           )}
                           {call.status === "PARTIAL" && (
-                            <AlertCircle className="h-3 w-3 text-amber-400" />
+                            <AlertCircle className="h-3 w-3 text-amber-600" />
                           )}
                           {call.status === "FAIL" && (
-                            <ShieldAlert className="h-3 w-3 text-rose-400" />
+                            <ShieldAlert className="h-3 w-3 text-rose-600" />
                           )}
                           {call.status}
                         </span>

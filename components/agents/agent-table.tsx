@@ -63,20 +63,20 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
       {/* Table Toolbar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search agents by name or email..."
-            className="w-full pl-9 pr-3 py-2 text-xs bg-slate-900/80 border border-slate-800 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+            className="w-full pl-10 pr-3 py-2 text-xs bg-white border border-neutral-200 rounded-xl text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all shadow-xs"
           />
         </div>
 
         <button
           type="button"
           onClick={handleOpenCreate}
-          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-950/60 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs shadow-indigo-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
         >
           <UserPlus className="h-3.5 w-3.5" />
           Add Agent
@@ -84,11 +84,11 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
       </div>
 
       {/* Agents Table Card */}
-      <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl shadow-sm overflow-hidden backdrop-blur-sm">
+      <div className="bg-white border border-neutral-200/90 rounded-2xl shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="border-b border-slate-800 bg-slate-950/80 text-slate-400 font-mono text-[11px] uppercase tracking-wider">
+              <tr className="border-b border-neutral-200 bg-neutral-50/75 text-neutral-500 font-semibold uppercase tracking-wider">
                 <th className="py-3.5 px-6">Agent Name</th>
                 <th className="py-3.5 px-6">Email</th>
                 <th className="py-3.5 px-6">Status</th>
@@ -97,13 +97,13 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
                 <th className="py-3.5 px-6 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300">
+            <tbody className="divide-y divide-neutral-100 text-neutral-700">
               {filteredAgents.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500">
-                    <Users className="h-8 w-8 mx-auto mb-2 text-slate-600" />
-                    <p className="font-medium text-slate-300">No agents found</p>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                  <td colSpan={6} className="py-12 text-center text-neutral-400">
+                    <Users className="h-8 w-8 mx-auto mb-2 text-neutral-300" />
+                    <p className="font-medium text-neutral-700">No agents found</p>
+                    <p className="text-xs text-neutral-400 mt-0.5">
                       {searchQuery ? "Try a different search query" : "Click 'Add Agent' to register a sales rep"}
                     </p>
                   </td>
@@ -115,43 +115,43 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
                   return (
                     <tr
                       key={agent.id}
-                      className="hover:bg-slate-800/30 transition-colors group"
+                      className="hover:bg-neutral-50/70 transition-colors group"
                     >
                       {/* Name & Avatar */}
-                      <td className="py-3.5 px-6 font-medium text-white">
+                      <td className="py-3.5 px-6 font-medium text-neutral-900">
                         <div className="flex items-center gap-3">
-                          <div className="h-7 w-7 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-slate-200">
+                          <div className="h-8 w-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-xs text-neutral-700">
                             {agent.name.charAt(0)}
                           </div>
-                          <span>{agent.name}</span>
+                          <span className="font-semibold text-neutral-800">{agent.name}</span>
                         </div>
                       </td>
 
                       {/* Email */}
-                      <td className="py-3.5 px-6 text-slate-400 font-mono text-xs">
+                      <td className="py-3.5 px-6 text-neutral-500 font-medium text-xs">
                         {agent.email}
                       </td>
 
                       {/* Status */}
                       <td className="py-3.5 px-6">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-mono font-medium ${
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                             agent.active
-                              ? "bg-emerald-950/80 text-emerald-300 border border-emerald-800/60"
-                              : "bg-slate-900 text-slate-400 border border-slate-800"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                              : "bg-neutral-100 text-neutral-600 border border-neutral-200"
                           }`}
                         >
                           {agent.active ? (
-                            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+                            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
                           ) : (
-                            <XCircle className="h-3 w-3 text-slate-500" />
+                            <XCircle className="h-3 w-3 text-neutral-400" />
                           )}
                           {agent.active ? "Active" : "Inactive"}
                         </span>
                       </td>
 
                       {/* Calls count */}
-                      <td className="py-3.5 px-6 font-mono text-slate-300 tabular-nums">
+                      <td className="py-3.5 px-6 text-neutral-600 font-semibold tabular-nums">
                         {agent.calls_count}
                       </td>
 
@@ -159,18 +159,18 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
                       <td className="py-3.5 px-6 font-semibold">
                         {agent.average_score !== null ? (
                           <span
-                            className={`font-mono tabular-nums ${
+                            className={`tabular-nums text-sm font-bold ${
                               agent.average_score >= 80
-                                ? "text-emerald-400"
+                                ? "text-emerald-600"
                                 : agent.average_score >= 70
-                                ? "text-amber-400"
-                                : "text-rose-400"
+                                ? "text-amber-600"
+                                : "text-rose-600"
                             }`}
                           >
                             {agent.average_score}%
                           </span>
                         ) : (
-                          <span className="text-slate-600 font-mono">—</span>
+                          <span className="text-neutral-400 font-normal">—</span>
                         )}
                       </td>
 
@@ -180,7 +180,7 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(agent)}
-                            className="p-1.5 rounded-lg border border-transparent text-slate-400 hover:border-slate-700 hover:text-white hover:bg-slate-800 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                            className="p-1.5 rounded-lg border border-transparent text-neutral-400 hover:border-neutral-200 hover:text-neutral-800 hover:bg-neutral-50 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                             title="Edit agent"
                             aria-label={`Edit ${agent.name}`}
                           >
@@ -191,10 +191,10 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
                             type="button"
                             onClick={() => handleToggleStatus(agent)}
                             disabled={isToggling}
-                            className={`p-1.5 rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                            className={`p-1.5 rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
                               agent.active
-                                ? "border-slate-800 text-rose-400 hover:border-rose-700 hover:bg-rose-950/60"
-                                : "border-slate-800 text-emerald-400 hover:border-emerald-700 hover:bg-emerald-950/60"
+                                ? "border-neutral-200 text-rose-600 hover:border-rose-300 hover:bg-rose-50"
+                                : "border-neutral-200 text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50"
                             }`}
                             title={agent.active ? "Deactivate agent" : "Activate agent"}
                             aria-label={agent.active ? `Deactivate ${agent.name}` : `Activate ${agent.name}`}
@@ -222,7 +222,6 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
         agent={selectedAgent}
         onClose={() => setModalOpen(false)}
         onSuccess={() => {
-          // Re-fetch or reload
           window.location.reload();
         }}
       />
