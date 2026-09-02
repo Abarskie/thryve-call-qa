@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
 import { Plus, PhoneCall } from "lucide-react";
 import Link from "next/link";
 
@@ -9,8 +8,6 @@ export default function CallsDirectoryPage() {
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <Topbar />
-
         <div className="p-8 space-y-7 flex-1">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

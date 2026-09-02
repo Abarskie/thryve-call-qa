@@ -7,10 +7,7 @@ export interface WorkspaceSettings {
   managerEmail: string;
   defaultModel: "gpt-4o-mini" | "gpt-4o";
   passingThreshold: number;
-  strictness: "standard" | "strict";
   openaiApiKey: string;
-  defaultLanguage: "en" | "auto";
-  retentionDays: number;
 }
 
 // In-memory / server-cached default state for settings
@@ -19,10 +16,7 @@ let cachedSettings: WorkspaceSettings = {
   managerEmail: "manager@thryve.qa",
   defaultModel: "gpt-4o-mini",
   passingThreshold: 75,
-  strictness: "standard",
   openaiApiKey: process.env.OPENAI_API_KEY ? "sk-••••••••••••••••••••••••" : "",
-  defaultLanguage: "en",
-  retentionDays: 0, // Forever
 };
 
 /**
@@ -59,14 +53,10 @@ export async function updateSettingsAction(
       }
     }
 
+    // Merge updates
     cachedSettings = {
       ...cachedSettings,
       ...newSettings,
-      // If user provided a real new API key, update it
-      openaiApiKey:
-        newSettings.openaiApiKey && !newSettings.openaiApiKey.includes("••••")
-          ? newSettings.openaiApiKey
-          : cachedSettings.openaiApiKey,
     };
 
     revalidatePath("/settings");
@@ -77,11 +67,10 @@ export async function updateSettingsAction(
       data: { ...cachedSettings },
     };
   } catch (err: unknown) {
-    console.error("Failed to update settings:", err);
+    const errorMsg = err instanceof Error ? err.message : "Failed to update settings.";
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to update settings.",
+      error: errorMsg,
     };
   }
 }
-

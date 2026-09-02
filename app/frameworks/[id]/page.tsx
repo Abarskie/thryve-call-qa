@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
 import { FrameworkEditor } from "@/components/frameworks/framework-editor";
 import { getFrameworkByIdAction } from "@/app/actions/frameworks";
 
@@ -25,8 +24,6 @@ export default async function EditFrameworkPage({ params }: EditFrameworkPagePro
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <Topbar />
-
         <div className="p-8 flex-1">
           <FrameworkEditor initialFramework={result.data} />
         </div>

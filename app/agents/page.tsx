@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
 import { getAgentsAction } from "@/app/actions/agents";
 import { AgentTable } from "@/components/agents/agent-table";
 import { Users, UserCheck, Award } from "lucide-react";
@@ -14,13 +13,14 @@ export default async function AgentsPage() {
   const activeAgents = agents.filter((a) => a.active).length;
 
   const agentsWithScores = agents.filter((a) => a.average_score !== null);
-  const teamAvgScore = agentsWithScores.length > 0
-    ? Math.round(
-        (agentsWithScores.reduce((acc, a) => acc + (a.average_score ?? 0), 0) /
-          agentsWithScores.length) *
-          10
-      ) / 10
-    : null;
+  const teamAvgScore =
+    agentsWithScores.length > 0
+      ? Math.round(
+          (agentsWithScores.reduce((acc, a) => acc + (a.average_score ?? 0), 0) /
+            agentsWithScores.length) *
+            10
+        ) / 10
+      : null;
 
   const statCards = [
     {
@@ -48,16 +48,11 @@ export default async function AgentsPage() {
 
   return (
     <div className="flex min-h-screen bg-neutral-100 text-neutral-800">
-      {/* Admina Twin Sidebar */}
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Admina Topbar */}
-        <Topbar />
-
-        {/* Content */}
         <div className="p-8 space-y-7 flex-1">
-          {/* Header */}
+          {/* Page Header */}
           <div>
             <h1 className="text-xl font-bold text-neutral-900 tracking-tight">
               Sales Agents
@@ -67,7 +62,7 @@ export default async function AgentsPage() {
             </p>
           </div>
 
-          {/* Admina Stat Cards */}
+          {/* Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {statCards.map((stat) => {
               const Icon = stat.icon;

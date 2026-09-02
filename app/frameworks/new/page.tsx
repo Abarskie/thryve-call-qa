@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
 import { FrameworkEditor } from "@/components/frameworks/framework-editor";
 
 export default function NewFrameworkPage() {
@@ -8,8 +7,6 @@ export default function NewFrameworkPage() {
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <Topbar />
-
         <div className="p-8 flex-1">
           <FrameworkEditor />
         </div>

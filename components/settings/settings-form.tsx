@@ -9,16 +9,13 @@ import {
   Sparkles,
   Building2,
   Key,
-  Database,
   CheckCircle2,
   AlertCircle,
   Eye,
   EyeOff,
   Loader2,
   Save,
-  Volume2,
   Sliders,
-  ShieldCheck,
 } from "lucide-react";
 
 interface SettingsFormProps {
@@ -26,9 +23,7 @@ interface SettingsFormProps {
 }
 
 export function SettingsForm({ initialSettings }: SettingsFormProps) {
-  const [activeTab, setActiveTab] = useState<
-    "general" | "ai" | "integrations" | "audio"
-  >("general");
+  const [activeTab, setActiveTab] = useState<"general" | "ai" | "keys">("general");
 
   const [companyName, setCompanyName] = useState(initialSettings.companyName);
   const [managerEmail, setManagerEmail] = useState(initialSettings.managerEmail);
@@ -38,24 +33,13 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   const [passingThreshold, setPassingThreshold] = useState(
     initialSettings.passingThreshold
   );
-  const [strictness, setStrictness] = useState<"standard" | "strict">(
-    initialSettings.strictness
-  );
   const [openaiApiKey, setOpenaiApiKey] = useState(
     initialSettings.openaiApiKey || ""
   );
   const [showApiKey, setShowApiKey] = useState(false);
-  const [defaultLanguage, setDefaultLanguage] = useState<"en" | "auto">(
-    initialSettings.defaultLanguage
-  );
-  const [retentionDays, setRetentionDays] = useState(
-    initialSettings.retentionDays
-  );
 
   const [isPending, startTransition] = useTransition();
-  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">(
-    "idle"
-  );
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSave = (e: React.FormEvent) => {
@@ -69,10 +53,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         managerEmail,
         defaultModel,
         passingThreshold: Number(passingThreshold),
-        strictness,
         openaiApiKey,
-        defaultLanguage,
-        retentionDays: Number(retentionDays),
       });
 
       if (result.success) {
@@ -87,9 +68,8 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   const tabs = [
     { id: "general", label: "General", icon: Building2 },
-    { id: "ai", label: "AI & QA Engine", icon: Sparkles },
-    { id: "integrations", label: "Keys & Connected", icon: Key },
-    { id: "audio", label: "Audio & Retention", icon: Volume2 },
+    { id: "ai", label: "AI Model & Scoring", icon: Sparkles },
+    { id: "keys", label: "API Credentials", icon: Key },
   ] as const;
 
   return (
@@ -184,29 +164,29 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   required
                 />
                 <p className="text-[11px] text-neutral-400 mt-1.5">
-                  Receives automated alerts when a call fails the QA threshold.
+                  Receives notifications regarding call QA scoring and compliance.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* 2. AI & QA Engine */}
+        {/* 2. AI Model & Scoring */}
         {activeTab === "ai" && (
           <div className="space-y-6">
             <div>
               <h3 className="text-base font-bold text-neutral-900">
-                AI QA Engine & Scoring
+                AI Evaluation Model & Passing Score
               </h3>
               <p className="text-xs text-neutral-500 mt-0.5">
-                Configure which AI model grades your calls and define passing benchmarks.
+                Configure which OpenAI model grades your calls and define the passing benchmark.
               </p>
             </div>
 
             {/* Model Selection */}
             <div className="space-y-3 pt-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                Default AI Evaluation Model
+                Default Evaluation Model
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* GPT-4o-mini Card */}
@@ -228,13 +208,8 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                       </span>
                     </div>
                     <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                      Ultra-fast evaluation (~1-2s), extremely cost-effective.
-                      Perfect for high-volume checklist QA.
+                      Fast evaluation (~1-2s), cost-effective. Perfect for high-volume sales QA checklists.
                     </p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-medium">
-                    <span>Speed: ⚡⚡⚡ High</span>
-                    <span>Cost: ~$0.001 / call</span>
                   </div>
                 </div>
 
@@ -257,13 +232,8 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                       </span>
                     </div>
                     <p className="text-xs text-neutral-500 mt-2 leading-relaxed">
-                      Deep context understanding and advanced nuanced objection
-                      coaching for high-ticket closing calls.
+                      Deep context understanding and nuanced feedback for complex high-ticket objection handling.
                     </p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-neutral-100 flex items-center justify-between text-xs text-neutral-500 font-medium">
-                    <span>Speed: ⚡ Normal</span>
-                    <span>Cost: ~$0.015 / call</span>
                   </div>
                 </div>
               </div>
@@ -299,85 +269,26 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 <span>95% (Strict)</span>
               </div>
               <p className="text-xs text-neutral-500 mt-2">
-                Calls with overall compliance score equal to or greater than{" "}
+                Calls scoring equal to or higher than{" "}
                 <strong className="text-neutral-800">{passingThreshold}%</strong>{" "}
-                will receive a <span className="text-emerald-700 font-semibold">PASS</span> badge.
+                will be marked with a <span className="text-emerald-700 font-semibold">PASS</span> badge.
               </p>
-            </div>
-
-            {/* QA Strictness */}
-            <div className="pt-4 border-t border-neutral-100">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-2">
-                Evaluation Strictness Mode
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label
-                  className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
-                    strictness === "standard"
-                      ? "border-indigo-600 bg-indigo-50/40"
-                      : "border-neutral-200 hover:border-neutral-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="strictness"
-                    value="standard"
-                    checked={strictness === "standard"}
-                    onChange={() => setStrictness("standard")}
-                    className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <div>
-                    <span className="text-xs font-bold text-neutral-900 block">
-                      Standard (Semantic Understanding)
-                    </span>
-                    <span className="text-[11px] text-neutral-500">
-                      Allows agent rephrasing and natural conversational flow.
-                    </span>
-                  </div>
-                </label>
-
-                <label
-                  className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${
-                    strictness === "strict"
-                      ? "border-indigo-600 bg-indigo-50/40"
-                      : "border-neutral-200 hover:border-neutral-300"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="strictness"
-                    value="strict"
-                    checked={strictness === "strict"}
-                    onChange={() => setStrictness("strict")}
-                    className="mt-0.5 text-indigo-600 focus:ring-indigo-500"
-                  />
-                  <div>
-                    <span className="text-xs font-bold text-neutral-900 block">
-                      Strict (Verbatim Adherence)
-                    </span>
-                    <span className="text-[11px] text-neutral-500">
-                      Requires exact framework keywords and mandatory stage orders.
-                    </span>
-                  </div>
-                </label>
-              </div>
             </div>
           </div>
         )}
 
-        {/* 3. Keys & Integrations */}
-        {activeTab === "integrations" && (
+        {/* 3. API Credentials */}
+        {activeTab === "keys" && (
           <div className="space-y-6">
             <div>
               <h3 className="text-base font-bold text-neutral-900">
-                API Keys & Connected Services
+                OpenAI API Credentials
               </h3>
               <p className="text-xs text-neutral-500 mt-0.5">
-                Manage your AI credentials and inspect connected backend services.
+                Used server-side for audio transcription (Whisper) and framework evaluation.
               </p>
             </div>
 
-            {/* OpenAI Key */}
             <div className="pt-2">
               <label
                 htmlFor="openaiApiKey"
@@ -408,139 +319,16 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 </button>
               </div>
               <p className="text-[11px] text-neutral-400 mt-1.5">
-                Used server-side only for audio transcription (Whisper) and QA analysis.
-                Never exposed to the client browser.
+                Stored safely on the server. Never exposed to the browser.
               </p>
-            </div>
-
-            {/* Connected Backend Health Card */}
-            <div className="pt-4 border-t border-neutral-100">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3 flex items-center gap-2">
-                <Database className="h-4 w-4 text-neutral-400" />
-                Local Backend Services
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl border border-neutral-200 bg-neutral-50/60 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <div>
-                      <div className="text-xs font-bold text-neutral-900">
-                        Supabase PostgreSQL
-                      </div>
-                      <div className="text-[10px] font-mono text-neutral-400">
-                        Docker (Port 54322)
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    CONNECTED
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-2xl border border-neutral-200 bg-neutral-50/60 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <div>
-                      <div className="text-xs font-bold text-neutral-900">
-                        Storage: call-recordings
-                      </div>
-                      <div className="text-[10px] font-mono text-neutral-400">
-                        Local Bucket Ready
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    ACTIVE
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         )}
 
-        {/* 4. Audio & Retention */}
-        {activeTab === "audio" && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-base font-bold text-neutral-900">
-                Audio Processing & Retention
-              </h3>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Manage audio storage lifespan and speech recognition defaults.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-              <div>
-                <label
-                  htmlFor="defaultLanguage"
-                  className="block text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-1.5"
-                >
-                  Transcription Primary Language
-                </label>
-                <select
-                  id="defaultLanguage"
-                  value={defaultLanguage}
-                  onChange={(e) =>
-                    setDefaultLanguage(e.target.value as "en" | "auto")
-                  }
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white focus:bg-white border border-neutral-200 rounded-xl text-xs text-neutral-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
-                >
-                  <option value="en">English (Recommended)</option>
-                  <option value="auto">Auto-detect Language</option>
-                </select>
-                <p className="text-[11px] text-neutral-400 mt-1.5">
-                  Explicitly setting English increases transcription accuracy and speed.
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="retentionDays"
-                  className="block text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-1.5"
-                >
-                  Audio Storage Retention Policy
-                </label>
-                <select
-                  id="retentionDays"
-                  value={retentionDays}
-                  onChange={(e) => setRetentionDays(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white focus:bg-white border border-neutral-200 rounded-xl text-xs text-neutral-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
-                >
-                  <option value={0}>Keep Forever (Default)</option>
-                  <option value={30}>Auto-delete after 30 days</option>
-                  <option value={60}>Auto-delete after 60 days</option>
-                  <option value={90}>Auto-delete after 90 days</option>
-                </select>
-                <p className="text-[11px] text-neutral-400 mt-1.5">
-                  Transcripts and scorecard results are always permanently kept.
-                </p>
-              </div>
-            </div>
-
-            {/* Supported Formats Info */}
-            <div className="pt-4 border-t border-neutral-100">
-              <div className="rounded-2xl bg-neutral-50 border border-neutral-200 p-4 flex items-start gap-3">
-                <ShieldCheck className="h-5 w-5 text-indigo-600 shrink-0 mt-0.5" />
-                <div className="text-xs text-neutral-600 space-y-1">
-                  <p className="font-bold text-neutral-900">
-                    Supported Audio Formats
-                  </p>
-                  <p>
-                    The platform natively processes <strong className="text-neutral-900">.mp3</strong>,{" "}
-                    <strong className="text-neutral-900">.wav</strong>, and <strong className="text-neutral-900">.m4a</strong> files up to{" "}
-                    <strong className="text-neutral-900">25 MB</strong> per call recording.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Footer Actions */}
+        {/* Footer Save Button */}
         <div className="mt-8 pt-5 border-t border-neutral-100 flex items-center justify-between">
           <span className="text-xs text-neutral-400">
-            Changes take effect immediately across all new call uploads.
+            Changes take effect immediately across all new call audits.
           </span>
           <button
             type="submit"

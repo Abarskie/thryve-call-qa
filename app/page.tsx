@@ -1,96 +1,57 @@
 import Link from "next/link";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
+import { getDashboardDataAction } from "@/app/actions/calls";
 import {
   ArrowUpRight,
   CheckCircle2,
   AlertCircle,
   FileAudio,
-  TrendingUp,
   Activity,
-  Users2,
+  Award,
+  Users,
   ShieldAlert,
+  Clock,
 } from "lucide-react";
 
-export default function Home() {
+export const revalidate = 0;
+
+export default async function Home() {
+  const result = await getDashboardDataAction();
+  const { totalCalls, activeAgents, averageScore, recentCalls } = result.data;
+
   const stats = [
     {
       name: "Average Call Score",
-      value: "82%",
-      change: "+3.2%",
-      trend: "up",
-      period: "vs last week",
-      icon: TrendingUp,
+      value: averageScore !== null ? `${averageScore}%` : "—",
+      sub: averageScore !== null ? "Across evaluated calls" : "No calls scored yet",
+      icon: Award,
       bg: "bg-indigo-50 text-indigo-600",
     },
     {
       name: "Calls Analyzed",
-      value: "126",
-      change: "+18",
-      trend: "up",
-      period: "this week",
+      value: totalCalls.toString(),
+      sub: "Total uploaded recordings",
       icon: Activity,
       bg: "bg-emerald-50 text-emerald-600",
     },
     {
       name: "Active Sales Agents",
-      value: "12",
-      change: "+2 new",
-      trend: "up",
-      period: "monitored",
-      icon: Users2,
+      value: activeAgents.toString(),
+      sub: "Monitored for QA compliance",
+      icon: Users,
       bg: "bg-cyan-50 text-cyan-600",
-    },
-  ];
-
-  const recentCalls = [
-    {
-      id: "call-1",
-      agent: "Sarah Connor",
-      date: "Today, 02:45 PM",
-      framework: "Cold Calling Framework",
-      score: 88,
-      status: "PASS",
-    },
-    {
-      id: "call-2",
-      agent: "John Miller",
-      date: "Today, 01:15 PM",
-      framework: "Discovery Call Framework",
-      score: 74,
-      status: "PARTIAL",
-    },
-    {
-      id: "call-3",
-      agent: "Alex Rivera",
-      date: "Yesterday",
-      framework: "Inbound Lead Qualification",
-      score: 91,
-      status: "PASS",
-    },
-    {
-      id: "call-4",
-      agent: "Emily Watson",
-      date: "Yesterday",
-      framework: "Cold Calling Framework",
-      score: 58,
-      status: "FAIL",
     },
   ];
 
   return (
     <div className="flex min-h-screen bg-neutral-100 text-neutral-800">
-      {/* Admina Twin Sidebar */}
+      {/* Streamlined Admina Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Admina Topbar */}
-        <Topbar />
-
-        {/* Page Content */}
         <div className="p-8 space-y-7 flex-1">
-          {/* Page Title & Action Header */}
+          {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-xl font-bold text-neutral-900 tracking-tight">
@@ -112,45 +73,37 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Admina Stat Cards */}
+          {/* Real Metric Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {stats.map((stat) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={stat.name}
-                  className="bg-white border border-neutral-200/90 rounded-2xl p-6 shadow-xs hover:shadow-md transition-shadow flex items-center justify-between"
+                  className="bg-white border border-neutral-200/90 rounded-2xl p-6 shadow-xs hover:shadow-md transition-shadow flex items-center gap-4"
                 >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 ${stat.bg} shadow-xs`}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block">
-                        {stat.name}
-                      </span>
-                      <div className="mt-1 text-2xl font-bold text-neutral-900 tabular-nums">
-                        {stat.value}
-                      </div>
-                      <span className="text-[11px] text-neutral-400 font-medium">
-                        {stat.period}
-                      </span>
-                    </div>
+                  <div
+                    className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 ${stat.bg} shadow-xs`}
+                  >
+                    <Icon className="h-6 w-6" />
                   </div>
-
-                  {/* Trend Pill Badge */}
-                  <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <TrendingUp className="h-3 w-3" />
-                    {stat.change}
+                  <div>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-neutral-400 block">
+                      {stat.name}
+                    </span>
+                    <div className="mt-1 text-2xl font-bold text-neutral-900 tabular-nums">
+                      {stat.value}
+                    </div>
+                    <span className="text-[11px] text-neutral-400 font-medium">
+                      {stat.sub}
+                    </span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Recent Evaluated Calls Table */}
+          {/* Recent Calls Section */}
           <div className="bg-white border border-neutral-200/90 rounded-2xl shadow-xs overflow-hidden">
             <div className="px-6 py-5 border-b border-neutral-100 flex items-center justify-between">
               <div>
@@ -170,81 +123,108 @@ export default function Home() {
               </Link>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse text-xs">
-                <thead>
-                  <tr className="border-b border-neutral-200 bg-neutral-50/75 text-neutral-500 font-semibold uppercase tracking-wider">
-                    <th className="py-3.5 px-6">Agent</th>
-                    <th className="py-3.5 px-6">Framework</th>
-                    <th className="py-3.5 px-6">Date</th>
-                    <th className="py-3.5 px-6">QA Score</th>
-                    <th className="py-3.5 px-6">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-neutral-100 text-neutral-700">
-                  {recentCalls.map((call) => (
-                    <tr
-                      key={call.id}
-                      className="hover:bg-neutral-50/70 transition-colors group"
-                    >
-                      <td className="py-3.5 px-6 font-medium text-neutral-900 flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-xs text-neutral-700 font-bold">
-                          {call.agent.charAt(0)}
-                        </div>
-                        <span className="font-semibold text-neutral-800">
-                          {call.agent}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-6 text-neutral-600 font-medium">
-                        {call.framework}
-                      </td>
-                      <td className="py-3.5 px-6 text-neutral-400 text-xs">
-                        {call.date}
-                      </td>
-                      <td className="py-3.5 px-6 font-semibold">
-                        <span
-                          className={`tabular-nums text-sm font-bold ${
-                            call.score >= 80
-                              ? "text-emerald-600"
-                              : call.score >= 70
-                              ? "text-amber-600"
-                              : "text-rose-600"
-                          }`}
-                        >
-                          {call.score}%
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-6">
-                        <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            call.status === "PASS"
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : call.status === "PARTIAL"
-                              ? "bg-amber-50 text-amber-700 border border-amber-200"
-                              : "bg-rose-50 text-rose-700 border border-rose-200"
-                          }`}
-                        >
-                          {call.status === "PASS" && (
-                            <CheckCircle2 className="h-3 w-3 text-emerald-600" />
-                          )}
-                          {call.status === "PARTIAL" && (
-                            <AlertCircle className="h-3 w-3 text-amber-600" />
-                          )}
-                          {call.status === "FAIL" && (
-                            <ShieldAlert className="h-3 w-3 text-rose-600" />
-                          )}
-                          {call.status}
-                        </span>
-                      </td>
+            {recentCalls.length === 0 ? (
+              <div className="py-16 text-center text-neutral-400 px-6">
+                <FileAudio className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
+                <p className="font-semibold text-neutral-800 text-sm">
+                  No call recordings evaluated yet
+                </p>
+                <p className="text-xs text-neutral-400 max-w-sm mx-auto mt-1 mb-5 leading-relaxed">
+                  Upload an audio recording to transcribe the dialogue and evaluate quality compliance with AI.
+                </p>
+                <Link
+                  href="/calls/upload"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors shadow-xs shadow-indigo-100"
+                >
+                  <FileAudio className="h-3.5 w-3.5" />
+                  Upload First Call
+                </Link>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="border-b border-neutral-200 bg-neutral-50/75 text-neutral-500 font-semibold uppercase tracking-wider">
+                      <th className="py-3.5 px-6">Agent</th>
+                      <th className="py-3.5 px-6">Framework</th>
+                      <th className="py-3.5 px-6">Date</th>
+                      <th className="py-3.5 px-6">QA Score</th>
+                      <th className="py-3.5 px-6">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-neutral-700">
+                    {recentCalls.map((call) => (
+                      <tr
+                        key={call.id}
+                        className="hover:bg-neutral-50/70 transition-colors group"
+                      >
+                        <td className="py-3.5 px-6 font-medium text-neutral-900 flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-xs text-neutral-700 font-bold">
+                            {call.agentName.charAt(0)}
+                          </div>
+                          <span className="font-semibold text-neutral-800">
+                            {call.agentName}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-6 text-neutral-600 font-medium">
+                          {call.frameworkName}
+                        </td>
+                        <td className="py-3.5 px-6 text-neutral-400 text-xs">
+                          {call.createdAt}
+                        </td>
+                        <td className="py-3.5 px-6 font-semibold">
+                          {call.score !== null ? (
+                            <span
+                              className={`tabular-nums text-sm font-bold ${
+                                call.score >= 80
+                                  ? "text-emerald-600"
+                                  : call.score >= 70
+                                  ? "text-amber-600"
+                                  : "text-rose-600"
+                              }`}
+                            >
+                              {call.score}%
+                            </span>
+                          ) : (
+                            <span className="text-neutral-400 font-normal">—</span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-6">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                              call.status === "PASS"
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : call.status === "PARTIAL"
+                                ? "bg-amber-50 text-amber-700 border border-amber-200"
+                                : call.status === "FAIL"
+                                ? "bg-rose-50 text-rose-700 border border-rose-200"
+                                : "bg-neutral-100 text-neutral-600 border border-neutral-200"
+                            }`}
+                          >
+                            {call.status === "PASS" && (
+                              <CheckCircle2 className="h-3 w-3 text-emerald-600" />
+                            )}
+                            {call.status === "PARTIAL" && (
+                              <AlertCircle className="h-3 w-3 text-amber-600" />
+                            )}
+                            {call.status === "FAIL" && (
+                              <ShieldAlert className="h-3 w-3 text-rose-600" />
+                            )}
+                            {call.status === "PENDING" && (
+                              <Clock className="h-3 w-3 text-neutral-500" />
+                            )}
+                            {call.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </main>
     </div>
   );
 }
-

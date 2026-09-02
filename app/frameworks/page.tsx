@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
 import { getFrameworksAction } from "@/app/actions/frameworks";
 import { FrameworkList } from "@/components/frameworks/framework-list";
 import { GitFork, CheckCircle2, Layers } from "lucide-react";
@@ -40,14 +39,9 @@ export default async function FrameworksPage() {
 
   return (
     <div className="flex min-h-screen bg-neutral-100 text-neutral-800">
-      {/* Admina Twin Sidebar */}
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Admina Topbar */}
-        <Topbar />
-
-        {/* Content */}
         <div className="p-8 space-y-7 flex-1">
           {/* Header */}
           <div>
@@ -59,7 +53,7 @@ export default async function FrameworksPage() {
             </p>
           </div>
 
-          {/* Admina Stat Cards */}
+          {/* Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {statCards.map((stat) => {
               const Icon = stat.icon;

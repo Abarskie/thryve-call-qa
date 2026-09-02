@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
 import { CallUploadForm } from "@/components/calls/call-upload-form";
 import { getAgentsAction } from "@/app/actions/agents";
 import { getFrameworksAction } from "@/app/actions/frameworks";
@@ -12,18 +11,14 @@ export default async function CallUploadPage() {
     getFrameworksAction(),
   ]);
 
-  const agents = agentsRes.data?.filter(a => a.active) || [];
-  const frameworks = frameworksRes.data?.filter(f => f.active) || [];
+  const agents = agentsRes.data?.filter((a) => a.active) || [];
+  const frameworks = frameworksRes.data?.filter((f) => f.active) || [];
 
   return (
     <div className="flex min-h-screen bg-neutral-100 text-neutral-800">
-      {/* Admina Twin Sidebar */}
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        {/* Admina Topbar */}
-        <Topbar />
-
         <div className="p-8 space-y-6 flex-1">
           <div className="flex items-center gap-3">
             <Link 
