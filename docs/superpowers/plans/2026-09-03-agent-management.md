@@ -35,3 +35,4 @@
 - Run test script to verify create/update/toggle agent in Supabase.
 - Run `npm run lint`, `npx tsc --noEmit`, and `npm run build`.
 - Verify `http://localhost:3000/agents` renders live data.
+

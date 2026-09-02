@@ -164,3 +164,4 @@ export function AgentModal({ isOpen, onClose, agent, onSuccess }: AgentModalProp
     </div>
   );
 }
+

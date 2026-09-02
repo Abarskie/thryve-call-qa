@@ -37,3 +37,4 @@ Allow sales managers to view, create, edit, and deactivate/activate sales agents
 - Toggle active status and verify update.
 - Ensure `tsc --noEmit`, `npm run lint`, and `npm run build` pass cleanly.
 - Verify `http://localhost:3000/agents` renders correctly.
+

@@ -218,3 +218,4 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
     </div>
   );
 }
+
