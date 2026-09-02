@@ -476,3 +476,4 @@ export type TablesUpdate<
     ? U
     : never
   : never
+
