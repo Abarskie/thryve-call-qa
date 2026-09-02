@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CallCoach AI - Call Quality Assurance & Coaching",
+  title: "Thryve Call QA - Call Quality Assurance & Coaching",
   description: "AI-powered Call Quality Assurance and Coaching platform for sales teams.",
 };
 

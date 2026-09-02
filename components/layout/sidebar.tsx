@@ -26,10 +26,10 @@ export function Sidebar() {
       <div className="h-16 flex items-center px-6 border-b border-slate-200">
         <Link href="/" className="flex items-center gap-2">
           <div className="h-8 w-8 rounded bg-slate-900 flex items-center justify-center text-white font-bold text-sm">
-            C
+            T
           </div>
           <span className="font-semibold text-slate-900 tracking-tight text-lg">
-            CallCoach AI
+            Thryve Call QA
           </span>
         </Link>
       </div>

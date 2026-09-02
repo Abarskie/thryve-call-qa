@@ -1,5 +1,5 @@
 /**
- * Callsy QA (CallCoach AI) - TypeScript Database & Entity Definitions
+ * Thryve Call QA - TypeScript Database & Entity Definitions
  * 
  * Defines strict TypeScript interfaces for:
  * 1. JSONB document structures (Framework stages, requirements, diarized segments, AI analysis results).
