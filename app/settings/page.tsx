@@ -7,22 +7,22 @@ export default async function SettingsPage() {
   const { data: initialSettings } = await getSettingsAction();
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-slate-950 text-slate-100">
       <Sidebar />
 
-      <main className="flex-1 flex flex-col min-w-0 bg-slate-50">
+      <main className="flex-1 flex flex-col min-w-0 bg-slate-950">
         {/* Top Header */}
-        <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-8 shrink-0">
+        <header className="h-16 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md flex items-center justify-between px-8 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-700">
-              <Sliders className="h-4 w-4" />
+            <div className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300">
+              <Sliders className="h-4 w-4 text-emerald-400" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-slate-900 leading-tight">
+              <h1 className="text-base font-semibold text-white tracking-tight leading-tight">
                 Settings
               </h1>
-              <p className="text-xs text-slate-500">
-                Workspace configuration, AI model parameters & integrations
+              <p className="text-[11px] text-slate-400">
+                Workspace configuration, AI model parameters & connected backends
               </p>
             </div>
           </div>
@@ -38,4 +38,3 @@ export default async function SettingsPage() {
     </div>
   );
 }
-

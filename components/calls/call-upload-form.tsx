@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadCallAction } from "@/app/actions/calls";
-import { Loader2, UploadCloud, FileAudio, AlertCircle } from "lucide-react";
+import { Loader2, UploadCloud, FileAudio, AlertCircle, CheckCircle2 } from "lucide-react";
 import type { Agent, CallFramework } from "@/types/database";
 
 interface CallUploadFormProps {
@@ -38,7 +38,7 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !agentId || !frameworkId) {
-      setError("Please fill out all fields and select a file.");
+      setError("Please select an agent, a framework, and an audio file.");
       return;
     }
 
@@ -53,7 +53,6 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
     try {
       const result = await uploadCallAction(formData);
       if (result.success && result.data) {
-        // Redirect to the newly created call's page (the viewer)
         router.push(`/calls/${result.data.id}`);
       } else {
         setError(result.error || "Failed to upload.");
@@ -66,28 +65,28 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 text-slate-200">
       {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-lg flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
-          <p className="text-sm text-rose-700">{error}</p>
+        <div className="p-4 bg-rose-950/60 border border-rose-800/60 rounded-xl flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-rose-400 shrink-0 mt-0.5" />
+          <p className="text-xs font-medium text-rose-300">{error}</p>
         </div>
       )}
 
       <div className="space-y-4">
         <div>
-          <label htmlFor="agentId" className="block text-sm font-medium text-slate-700 mb-1">
-            Agent
+          <label htmlFor="agentId" className="block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+            Select Sales Agent *
           </label>
           <select
             id="agentId"
             value={agentId}
             onChange={(e) => setAgentId(e.target.value)}
-            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent text-sm"
+            className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
             required
             disabled={isUploading}
           >
-            <option value="">Select an agent</option>
+            <option value="">Choose an agent...</option>
             {agents.map((agent) => (
               <option key={agent.id} value={agent.id}>
                 {agent.name}
@@ -97,57 +96,62 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         </div>
 
         <div>
-          <label htmlFor="frameworkId" className="block text-sm font-medium text-slate-700 mb-1">
-            Call Framework
+          <label htmlFor="frameworkId" className="block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+            Evaluation Framework *
           </label>
           <select
             id="frameworkId"
             value={frameworkId}
             onChange={(e) => setFrameworkId(e.target.value)}
-            className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent text-sm"
+            className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
             required
             disabled={isUploading}
           >
-            <option value="">Select a framework</option>
+            <option value="">Choose a QA framework...</option>
             {frameworks.map((fw) => (
               <option key={fw.id} value={fw.id}>
-                {fw.name}
+                {fw.name} ({fw.stages?.length || 0} stages)
               </option>
             ))}
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
-            Audio Recording
+          <label className="block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
+            Audio Recording File *
           </label>
-          <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 border-dashed rounded-xl hover:border-slate-400 transition-colors bg-slate-50">
-            <div className="space-y-1 text-center">
+          <div className="mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-slate-800 border-dashed rounded-xl hover:border-slate-700 transition-colors bg-slate-950/60">
+            <div className="space-y-2 text-center w-full">
               {file ? (
-                <div className="flex flex-col items-center gap-2">
-                  <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-2">
+                <div className="flex flex-col items-center gap-2 p-3 bg-slate-900/90 rounded-xl border border-slate-800">
+                  <div className="h-12 w-12 rounded-full bg-emerald-950/80 border border-emerald-800/60 flex items-center justify-center text-emerald-400 mb-1">
                     <FileAudio className="h-6 w-6" />
                   </div>
-                  <div className="text-sm font-medium text-slate-900">{file.name}</div>
-                  <div className="text-xs text-slate-500">{(file.size / (1024 * 1024)).toFixed(2)} MB</div>
+                  <div className="text-sm font-semibold text-white flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                    {file.name}
+                  </div>
+                  <div className="text-xs font-mono text-slate-400">
+                    {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  </div>
                   <button
                     type="button"
                     onClick={() => setFile(null)}
                     disabled={isUploading}
-                    className="mt-2 text-sm text-rose-600 hover:text-rose-700 font-medium"
+                    className="mt-2 text-xs font-medium text-rose-400 hover:text-rose-300 transition-colors"
                   >
-                    Remove file
+                    Remove selected file
                   </button>
                 </div>
               ) : (
                 <>
-                  <UploadCloud className="mx-auto h-12 w-12 text-slate-400" />
-                  <div className="flex text-sm text-slate-600 justify-center">
+                  <UploadCloud className="mx-auto h-10 w-10 text-slate-500" />
+                  <div className="flex text-xs text-slate-400 justify-center items-center gap-1">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-transparent font-medium text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                      className="relative cursor-pointer rounded font-semibold text-emerald-400 hover:text-emerald-300 focus-within:outline-none focus-within:underline"
                     >
-                      <span>Upload a file</span>
+                      <span>Choose recording</span>
                       <input
                         id="file-upload"
                         name="file-upload"
@@ -158,10 +162,10 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
                         disabled={isUploading}
                       />
                     </label>
-                    <p className="pl-1">or drag and drop</p>
+                    <span>or drag and drop here</span>
                   </div>
-                  <p className="text-xs text-slate-500">
-                    MP3, WAV, or M4A up to 25MB
+                  <p className="text-[11px] font-mono text-slate-500">
+                    MP3, WAV, or M4A (Max 25 MB)
                   </p>
                 </>
               )}
@@ -170,11 +174,11 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         </div>
       </div>
 
-      <div className="pt-4 flex justify-end">
+      <div className="pt-2 flex justify-end">
         <button
           type="submit"
           disabled={!file || !agentId || !frameworkId || isUploading}
-          className="inline-flex items-center gap-2 bg-slate-900 text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-lg text-xs font-semibold shadow-lg shadow-emerald-950/60 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isUploading ? (
             <>
@@ -184,7 +188,7 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
           ) : (
             <>
               <UploadCloud className="h-4 w-4" />
-              Upload Audio
+              Upload Recording
             </>
           )}
         </button>

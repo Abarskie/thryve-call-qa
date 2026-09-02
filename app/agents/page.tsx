@@ -22,81 +22,81 @@ export default async function AgentsPage() {
     : null;
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-950 text-slate-100">
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         {/* Header */}
-        <header className="h-16 border-b border-slate-200 bg-white flex items-center justify-between px-8">
-          <div>
-            <h1 className="text-lg font-semibold text-slate-900">Agents</h1>
+        <header className="h-16 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md flex items-center justify-between px-8 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300">
+              <Users className="h-4 w-4 text-emerald-400" />
+            </div>
+            <div>
+              <h1 className="text-base font-semibold text-white tracking-tight">
+                Sales Agents
+              </h1>
+              <p className="text-[11px] text-slate-400">
+                Team roster, status control & performance statistics
+              </p>
+            </div>
           </div>
         </header>
 
         {/* Content */}
-        <div className="p-8 space-y-6">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-              Sales Agents
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Manage team members, monitor quality scores, and review call compliance.
-            </p>
-          </div>
-
+        <div className="p-8 space-y-6 flex-1">
           {/* Metric Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 shadow-sm backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
                   Total Agents
                 </span>
-                <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600">
+                <div className="h-8 w-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-300">
                   <Users className="h-4 w-4" />
                 </div>
               </div>
-              <div className="mt-2 text-2xl font-bold text-slate-900">
+              <div className="mt-2 text-2xl font-bold font-mono text-white tabular-nums">
                 {totalAgents}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">Enrolled sales reps</p>
+              <p className="mt-1 text-xs text-slate-400">Registered in workspace</p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 shadow-sm backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Active Agents
+                <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
+                  Active Now
                 </span>
-                <div className="h-8 w-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <div className="h-8 w-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-emerald-400">
                   <UserCheck className="h-4 w-4" />
                 </div>
               </div>
-              <div className="mt-2 text-2xl font-bold text-slate-900">
+              <div className="mt-2 text-2xl font-bold font-mono text-emerald-400 tabular-nums">
                 {activeAgents}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">Available for calls</p>
+              <p className="mt-1 text-xs text-slate-400">Receiving call audits</p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 shadow-sm backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Team Avg Score
+                <span className="text-xs font-mono uppercase tracking-wider text-slate-400">
+                  Team Average Score
                 </span>
-                <div className="h-8 w-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                <div className="h-8 w-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-indigo-400">
                   <Award className="h-4 w-4" />
                 </div>
               </div>
-              <div className="mt-2 text-2xl font-bold text-slate-900">
+              <div className="mt-2 text-2xl font-bold font-mono text-white tabular-nums">
                 {teamAvgScore !== null ? `${teamAvgScore}%` : "—"}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">Across analyzed calls</p>
+              <p className="mt-1 text-xs text-slate-400">Across evaluated calls</p>
             </div>
           </div>
 
-          {/* Agents Table */}
+          {/* Table Container */}
           <AgentTable initialAgents={agents} />
         </div>
       </main>
     </div>
   );
 }
-

@@ -244,21 +244,21 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto pb-16">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl mx-auto pb-16 text-slate-200">
       {/* Top Action Bar */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Link
             href="/frameworks"
-            className="p-2 rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+            className="p-2 rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+            <h2 className="text-xl font-bold text-white tracking-tight">
               {isEditing ? `Edit: ${initialFramework?.name}` : "Create Call Framework"}
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-400">
               Define the required stages and checklist items AI evaluates in sales recordings.
             </p>
           </div>
@@ -267,14 +267,14 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
         <div className="flex items-center gap-2">
           <Link
             href="/frameworks"
-            className="px-4 py-2 text-xs font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            className="px-4 py-2 text-xs font-medium text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 hover:text-white transition-colors"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-slate-900 rounded-lg hover:bg-slate-800 transition-colors shadow-sm disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg transition-colors shadow-lg shadow-emerald-950/60 disabled:opacity-50"
           >
             {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {isEditing ? "Update Framework" : "Save Framework"}
@@ -284,16 +284,16 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
 
       {/* Error Alert */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-700 flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-rose-950/60 border border-rose-800/60 text-xs font-medium text-rose-300 flex items-center gap-2">
           <AlertTriangle className="h-4 w-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {/* Framework Meta Card */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
+      <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-6 shadow-sm space-y-4 backdrop-blur-sm">
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
             Framework Name *
           </label>
           <input
@@ -301,12 +301,12 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Inbound Demo Qualification Framework"
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all placeholder:text-slate-400"
+            className="w-full px-3.5 py-2 text-sm bg-slate-950 border border-slate-800 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+          <label className="block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-1.5">
             Description
           </label>
           <textarea
@@ -314,54 +314,54 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
             placeholder="Describe what type of calls this framework assesses and what quality standard is expected..."
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent transition-all placeholder:text-slate-400"
+            className="w-full px-3.5 py-2 text-sm bg-slate-950 border border-slate-800 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
           />
         </div>
       </div>
 
       {/* Weight Progress Bar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+      <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 shadow-sm backdrop-blur-sm">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+            <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
               Total Score Weight:
             </span>
             <span
-              className={`text-sm font-extrabold ${
+              className={`text-sm font-extrabold font-mono tabular-nums ${
                 isWeightValid
-                  ? "text-emerald-700"
+                  ? "text-emerald-400"
                   : totalWeight > 100
-                  ? "text-rose-600"
-                  : "text-amber-600"
+                  ? "text-rose-400"
+                  : "text-amber-400"
               }`}
             >
               {totalWeight}% / 100%
             </span>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs font-medium">
+          <div className="flex items-center gap-1.5 text-xs font-mono font-medium">
             {isWeightValid ? (
-              <span className="text-emerald-700 inline-flex items-center gap-1">
+              <span className="text-emerald-400 inline-flex items-center gap-1">
                 <CheckCircle2 className="h-3.5 w-3.5" /> Perfect 100% distribution
               </span>
             ) : totalWeight > 100 ? (
-              <span className="text-rose-600 inline-flex items-center gap-1">
+              <span className="text-rose-400 inline-flex items-center gap-1">
                 <AlertTriangle className="h-3.5 w-3.5" /> Over limit by {totalWeight - 100}%
               </span>
             ) : (
-              <span className="text-amber-600 inline-flex items-center gap-1">
+              <span className="text-amber-400 inline-flex items-center gap-1">
                 <AlertTriangle className="h-3.5 w-3.5" /> {100 - totalWeight}% remaining
               </span>
             )}
           </div>
         </div>
 
-        <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden flex">
+        <div className="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden flex border border-slate-800">
           {stages.map((stage, idx) => {
             const colors = [
               "bg-indigo-500",
               "bg-emerald-500",
-              "bg-sky-500",
+              "bg-cyan-500",
               "bg-amber-500",
               "bg-purple-500",
               "bg-rose-500",
@@ -383,15 +383,15 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Layers className="h-4 w-4 text-slate-600" />
-            <h3 className="text-base font-bold text-slate-900">
+            <Layers className="h-4 w-4 text-emerald-400" />
+            <h3 className="text-base font-bold text-white">
               Evaluation Stages ({stages.length})
             </h3>
           </div>
           <button
             type="button"
             onClick={handleAddStage}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 hover:text-white transition-colors"
           >
             <Plus className="h-3.5 w-3.5" />
             Add Stage
@@ -404,12 +404,12 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
             return (
               <div
                 key={stage.id}
-                className="bg-white border border-slate-200 rounded-xl shadow-sm p-5 space-y-4 transition-all"
+                className="bg-slate-900/50 border border-slate-800/80 rounded-xl shadow-sm p-5 space-y-4 transition-all backdrop-blur-sm"
               >
                 {/* Stage Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
                   <div className="flex items-center gap-2 flex-1">
-                    <span className="h-6 w-6 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
+                    <span className="h-6 w-6 rounded-full bg-slate-800 border border-slate-700 text-white flex items-center justify-center font-mono font-bold text-xs shrink-0">
                       {sIdx + 1}
                     </span>
                     <input
@@ -417,14 +417,14 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                       value={stage.name}
                       onChange={(e) => handleUpdateStageName(sIdx, e.target.value)}
                       placeholder={`Stage ${sIdx + 1} Title (e.g. Discovery)`}
-                      className="font-semibold text-sm text-slate-900 placeholder:text-slate-400 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-900 focus:outline-none px-1 py-0.5 transition-colors flex-1"
+                      className="font-semibold text-sm text-white placeholder:text-slate-500 bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none px-1 py-0.5 transition-colors flex-1"
                     />
                   </div>
 
                   <div className="flex items-center gap-2 justify-end">
                     {/* Weight Input */}
-                    <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1">
-                      <span className="text-xs font-medium text-slate-500">Weight:</span>
+                    <div className="flex items-center gap-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1">
+                      <span className="text-xs font-mono text-slate-500">Weight:</span>
                       <input
                         type="number"
                         min="0"
@@ -433,18 +433,18 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                         onChange={(e) =>
                           handleUpdateStageWeight(sIdx, Number(e.target.value))
                         }
-                        className="w-12 bg-transparent text-xs font-bold text-slate-900 focus:outline-none text-right"
+                        className="w-12 bg-transparent text-xs font-bold font-mono text-white focus:outline-none text-right"
                       />
-                      <span className="text-xs font-bold text-slate-700">%</span>
+                      <span className="text-xs font-bold font-mono text-slate-400">%</span>
                     </div>
 
                     {/* Reorder Buttons */}
-                    <div className="flex items-center border border-slate-200 rounded-lg overflow-hidden bg-white">
+                    <div className="flex items-center border border-slate-800 rounded-lg overflow-hidden bg-slate-950">
                       <button
                         type="button"
                         onClick={() => handleMoveStage(sIdx, "up")}
                         disabled={sIdx === 0}
-                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 hover:bg-slate-50 transition-colors"
+                        className="p-1 text-slate-500 hover:text-slate-300 disabled:opacity-30 hover:bg-slate-900 transition-colors"
                         title="Move Stage Up"
                       >
                         <ChevronUp className="h-3.5 w-3.5" />
@@ -453,7 +453,7 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                         type="button"
                         onClick={() => handleMoveStage(sIdx, "down")}
                         disabled={sIdx === stages.length - 1}
-                        className="p-1 text-slate-400 hover:text-slate-700 disabled:opacity-30 hover:bg-slate-50 transition-colors"
+                        className="p-1 text-slate-500 hover:text-slate-300 disabled:opacity-30 hover:bg-slate-900 transition-colors"
                         title="Move Stage Down"
                       >
                         <ChevronDown className="h-3.5 w-3.5" />
@@ -465,7 +465,7 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                       type="button"
                       onClick={() => handleRemoveStage(sIdx)}
                       disabled={stages.length <= 1}
-                      className="p-1.5 rounded-lg border border-transparent text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                      className="p-1.5 rounded-lg border border-slate-800 text-rose-400 hover:border-rose-700 hover:bg-rose-950/60 transition-all disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                       title="Delete Stage"
                       aria-label={`Delete Stage ${sIdx + 1}`}
                     >
@@ -477,13 +477,13 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                 {/* Stage Requirements Checklist */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    <span className="text-xs font-mono uppercase tracking-wider text-slate-500">
                       Requirements Checklist ({stage.requirements.length})
                     </span>
                     <button
                       type="button"
                       onClick={() => handleAddRequirement(sIdx)}
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 hover:text-slate-900 transition-colors"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
                     >
                       <Plus className="h-3 w-3" /> Add Requirement
                     </button>
@@ -494,9 +494,9 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                       return (
                         <div
                           key={req.id}
-                          className="flex items-center gap-2 group bg-slate-50/60 hover:bg-slate-50 rounded-lg p-1.5 border border-slate-200/70 transition-colors"
+                          className="flex items-center gap-2 group bg-slate-950/80 hover:bg-slate-950 rounded-lg p-2 border border-slate-800/80 transition-colors"
                         >
-                          <span className="text-xs font-medium text-slate-400 w-5 text-center shrink-0">
+                          <span className="text-xs font-mono text-slate-500 w-5 text-center shrink-0">
                             {rIdx + 1}.
                           </span>
                           <input
@@ -506,13 +506,13 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                               handleUpdateRequirementText(sIdx, rIdx, e.target.value)
                             }
                             placeholder="e.g. Introduce yourself and mention company name"
-                            className="flex-1 bg-transparent text-xs text-slate-800 focus:outline-none placeholder:text-slate-400"
+                            className="flex-1 bg-transparent text-xs text-white focus:outline-none placeholder:text-slate-500"
                           />
                           <button
                             type="button"
                             onClick={() => handleRemoveRequirement(sIdx, rIdx)}
                             disabled={stage.requirements.length <= 1}
-                            className="opacity-0 group-hover:opacity-100 p-1 text-rose-600 hover:bg-rose-50 rounded transition-all disabled:hidden focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                            className="opacity-0 group-hover:opacity-100 p-1 text-rose-400 hover:bg-rose-950/60 rounded transition-all disabled:hidden focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                             title="Delete Requirement"
                             aria-label={`Delete Requirement ${rIdx + 1}`}
                           >
@@ -532,7 +532,7 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
         <button
           type="button"
           onClick={handleAddStage}
-          className="w-full py-3 border-2 border-dashed border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:border-slate-400 hover:text-slate-900 transition-all flex items-center justify-center gap-2 bg-white"
+          className="w-full py-3 border-2 border-dashed border-slate-800 hover:border-slate-700 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-all flex items-center justify-center gap-2 bg-slate-900/30"
         >
           <Plus className="h-4 w-4" />
           Add Another Stage
