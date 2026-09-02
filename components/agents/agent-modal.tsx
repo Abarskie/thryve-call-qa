@@ -28,7 +28,15 @@ export function AgentModal({ isOpen, onClose, agent, onSuccess }: AgentModalProp
       setEmail("");
     }
     setError(null);
-  }, [agent, isOpen]);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    if (isOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [agent, isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -61,7 +69,12 @@ export function AgentModal({ isOpen, onClose, agent, onSuccess }: AgentModalProp
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-150">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-in fade-in duration-150"
+    >
       <div
         className="bg-white rounded-xl shadow-xl border border-slate-200 w-full max-w-md overflow-hidden"
         role="dialog"

@@ -465,8 +465,9 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                       type="button"
                       onClick={() => handleRemoveStage(sIdx)}
                       disabled={stages.length <= 1}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors disabled:opacity-30"
+                      className="p-1.5 rounded-lg border border-transparent text-rose-600 hover:border-rose-200 hover:bg-rose-50 transition-all disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                       title="Delete Stage"
+                      aria-label={`Delete Stage ${sIdx + 1}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -511,8 +512,9 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
                             type="button"
                             onClick={() => handleRemoveRequirement(sIdx, rIdx)}
                             disabled={stage.requirements.length <= 1}
-                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 transition-all disabled:hidden"
+                            className="opacity-0 group-hover:opacity-100 p-1 text-rose-600 hover:bg-rose-50 rounded transition-all disabled:hidden focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
                             title="Delete Requirement"
+                            aria-label={`Delete Requirement ${rIdx + 1}`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>

@@ -207,12 +207,13 @@ export function FrameworkList({ initialFrameworks }: FrameworkListProps) {
                       type="button"
                       onClick={() => handleToggleStatus(fw)}
                       disabled={isToggling}
-                      className={`p-1.5 rounded-lg border transition-colors ${
+                      className={`p-1.5 rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 ${
                         fw.active
-                          ? "border-slate-200 text-slate-400 hover:text-rose-600 hover:bg-rose-50"
-                          : "border-slate-200 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                          ? "border-slate-200 text-rose-600 hover:border-rose-300 hover:bg-rose-50"
+                          : "border-slate-200 text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50"
                       }`}
                       title={fw.active ? "Deactivate framework" : "Activate framework"}
+                      aria-label={fw.active ? `Deactivate ${fw.name}` : `Activate ${fw.name}`}
                     >
                       {isToggling ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -239,3 +240,4 @@ export function FrameworkList({ initialFrameworks }: FrameworkListProps) {
     </div>
   );
 }
+

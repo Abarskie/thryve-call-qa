@@ -175,8 +175,9 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(agent)}
-                            className="p-1.5 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                            className="p-1.5 rounded-lg border border-transparent text-slate-500 hover:border-slate-200 hover:text-slate-900 hover:bg-slate-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
                             title="Edit agent"
+                            aria-label={`Edit ${agent.name}`}
                           >
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
@@ -185,12 +186,13 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
                             type="button"
                             onClick={() => handleToggleStatus(agent)}
                             disabled={isToggling}
-                            className={`p-1.5 rounded-md transition-colors ${
+                            className={`p-1.5 rounded-lg border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 ${
                               agent.active
-                                ? "text-slate-400 hover:text-rose-600 hover:bg-rose-50"
-                                : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                                ? "border-slate-200 text-rose-600 hover:border-rose-300 hover:bg-rose-50"
+                                : "border-slate-200 text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50"
                             }`}
                             title={agent.active ? "Deactivate agent" : "Activate agent"}
+                            aria-label={agent.active ? `Deactivate ${agent.name}` : `Activate ${agent.name}`}
                           >
                             {isToggling ? (
                               <Loader2 className="h-3.5 w-3.5 animate-spin" />
