@@ -34,3 +34,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# ide and internal tools
+.vscode
+.superpowers
+
+
