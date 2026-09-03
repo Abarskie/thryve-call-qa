@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import type { CallReviewData } from "@/lib/call-processing/query";
 import { isStaleCall } from "@/lib/call-processing/scoring";
 import { deleteCallAction } from "@/app/actions/calls";
@@ -37,7 +36,6 @@ export function CallReview({
   now: initialNow,
   passingThreshold = 75,
 }: CallReviewProps) {
-  const router = useRouter();
   const [call, setCall] = useState<CallReviewData>(initialCall);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
@@ -59,7 +57,9 @@ export function CallReview({
     try {
       const res = await deleteCallAction(call.id);
       if (res.success) {
-        router.push("/calls");
+        if (typeof window !== "undefined") {
+          window.location.href = "/calls";
+        }
       } else {
         alert(res.error || "Failed to delete call recording.");
         setIsDeleting(false);
@@ -196,6 +196,7 @@ export function CallReview({
 
   // If completed and has analysis, render full report
   if (call.status === "completed" && call.analysis) {
+    return <CallReport call={call} />;
     return <CallReport call={call} passingThreshold={passingThreshold} />;
   }
 

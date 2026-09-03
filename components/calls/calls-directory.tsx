@@ -16,6 +16,7 @@ import {
   Loader2,
   Trash2,
   AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 import { deleteCallAction, type DashboardCall } from "@/app/actions/calls";
 
@@ -32,11 +33,38 @@ export function CallsDirectory({
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [stoppingId, setStoppingId] = useState<string | null>(null);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
   const [deleteConfirmCall, setDeleteConfirmCall] = useState<DashboardCall | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const passThreshold = passingThreshold;
   const partialThreshold = Math.round(passingThreshold * 0.8);
+
+  const handleRetry = async (callId: string) => {
+    setRetryingId(callId);
+    try {
+      setCalls((prev) =>
+        prev.map((c) => (c.id === callId ? { ...c, status: "PENDING" } : c))
+      );
+      const res = await fetch(`/api/calls/${callId}/process`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ retry: true }),
+      });
+      if (!res.ok) {
+        setCalls((prev) =>
+          prev.map((c) => (c.id === callId ? { ...c, status: "FAIL" } : c))
+        );
+      }
+    } catch (err) {
+      console.error("Failed to retry audit:", err);
+      setCalls((prev) =>
+        prev.map((c) => (c.id === callId ? { ...c, status: "FAIL" } : c))
+      );
+    } finally {
+      setRetryingId(null);
+    }
+  };
 
   const handleStop = async (callId: string) => {
     setStoppingId(callId);
@@ -249,6 +277,27 @@ export function CallsDirectory({
                               <XCircle className="h-3 w-3" />
                             )}
                             Stop Audit
+                          </button>
+                        )}
+
+                        {(call.status === "FAIL" || call.status === "FAILED") && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleRetry(call.id);
+                            }}
+                            disabled={retryingId === call.id}
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50"
+                            title="Retry call audit"
+                          >
+                            {retryingId === call.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <RefreshCw className="h-3 w-3" />
+                            )}
+                            Retry
                           </button>
                         )}
 

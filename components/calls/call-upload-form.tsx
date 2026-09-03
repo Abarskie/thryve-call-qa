@@ -2,9 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { uploadCallAction } from "@/app/actions/calls";
 import { validateAudioUploadFile } from "@/lib/audio-upload";
-import { Loader2, UploadCloud, FileAudio, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  Loader2,
+  UploadCloud,
+  FileAudio,
+  AlertCircle,
+  CheckCircle2,
+  Users,
+  GitFork,
+  ArrowRight,
+} from "lucide-react";
 import type { Agent, CallFramework } from "@/types/database";
 
 interface CallUploadFormProps {
@@ -18,21 +28,46 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
   const [agentId, setAgentId] = useState("");
   const [frameworkId, setFrameworkId] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadStep, setUploadStep] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleProcessFile = (candidateFile: File) => {
+    const validationError = validateAudioUploadFile(candidateFile);
+    if (validationError) {
+      setError(validationError);
+      setFile(null);
+      return;
+    }
+    setError(null);
+    setFile(candidateFile);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const selectedFile = e.target.files[0];
-      const validationError = validateAudioUploadFile(selectedFile);
+      handleProcessFile(e.target.files[0]);
+    }
+  };
 
-      if (validationError) {
-        setError(validationError);
-        setFile(null);
-        return;
-      }
-      
-      setError(null);
-      setFile(selectedFile);
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleProcessFile(e.dataTransfer.files[0]);
     }
   };
 
@@ -45,6 +80,7 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
 
     setIsUploading(true);
     setError(null);
+    setUploadStep("Uploading audio recording to secure storage...");
 
     const formData = new FormData();
     formData.append("file", file);
@@ -52,21 +88,66 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
     formData.append("frameworkId", frameworkId);
 
     try {
+      setTimeout(() => {
+        setUploadStep("Registering call and queueing AI evaluation pipeline...");
+      }, 1500);
+
       const result = await uploadCallAction(formData);
       if (result.success && result.data) {
+        setUploadStep("Upload complete! Redirecting to review...");
         router.push(`/calls/${result.data.id}`);
       } else {
         setError(result.error || "Failed to upload.");
         setIsUploading(false);
+        setUploadStep(null);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred during upload.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred during upload."
+      );
       setIsUploading(false);
+      setUploadStep(null);
     }
   };
 
+  const missingAgents = agents.length === 0;
+  const missingFrameworks = frameworks.length === 0;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 text-slate-200">
+      {/* Dependency alerts */}
+      {missingAgents && (
+        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between gap-3 text-xs text-amber-300">
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 shrink-0 text-amber-400" />
+            <span>No sales agents created yet. Add an agent first.</span>
+          </div>
+          <Link
+            href="/agents"
+            className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 hover:underline shrink-0"
+          >
+            Create Agent <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+      )}
+
+      {missingFrameworks && (
+        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between gap-3 text-xs text-amber-300">
+          <div className="flex items-center gap-2">
+            <GitFork className="h-4 w-4 shrink-0 text-amber-400" />
+            <span>No QA playbooks created yet. Create a framework first.</span>
+          </div>
+          <Link
+            href="/frameworks/new"
+            className="inline-flex items-center gap-1 font-semibold text-amber-400 hover:text-amber-300 hover:underline shrink-0"
+          >
+            Create Framework <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+      )}
+
       {error && (
         <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-start gap-3">
           <AlertCircle className="h-5 w-5 text-rose-400 shrink-0 mt-0.5" />
@@ -76,7 +157,10 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
 
       <div className="space-y-4">
         <div>
-          <label htmlFor="agentId" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+          <label
+            htmlFor="agentId"
+            className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+          >
             Select Sales Agent *
           </label>
           <select
@@ -85,9 +169,11 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
             onChange={(e) => setAgentId(e.target.value)}
             className="w-full px-3.5 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
             required
-            disabled={isUploading}
+            disabled={isUploading || missingAgents}
           >
-            <option value="">Choose an agent...</option>
+            <option value="">
+              {missingAgents ? "No agents available" : "Choose an agent..."}
+            </option>
             {agents.map((agent) => (
               <option key={agent.id} value={agent.id}>
                 {agent.name}
@@ -97,7 +183,10 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         </div>
 
         <div>
-          <label htmlFor="frameworkId" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+          <label
+            htmlFor="frameworkId"
+            className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+          >
             Evaluation Framework *
           </label>
           <select
@@ -106,9 +195,13 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
             onChange={(e) => setFrameworkId(e.target.value)}
             className="w-full px-3.5 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
             required
-            disabled={isUploading}
+            disabled={isUploading || missingFrameworks}
           >
-            <option value="">Choose a QA playbook...</option>
+            <option value="">
+              {missingFrameworks
+                ? "No frameworks available"
+                : "Choose a QA playbook..."}
+            </option>
             {frameworks.map((fw) => (
               <option key={fw.id} value={fw.id}>
                 {fw.name} ({fw.stages?.length || 0} stages)
@@ -121,7 +214,16 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
             Audio Recording File *
           </label>
-          <div className="mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-[#1e2e4a] border-dashed rounded-2xl hover:border-slate-600 transition-colors bg-[#0e1726]/50">
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-dashed rounded-2xl transition-all ${
+              isDragging
+                ? "border-blue-500 bg-blue-500/10 scale-[1.01]"
+                : "border-[#1e2e4a] hover:border-slate-600 bg-[#0e1726]/50"
+            }`}
+          >
             <div className="space-y-2 text-center w-full">
               {file ? (
                 <div className="flex flex-col items-center gap-2 p-4 bg-[#182338] rounded-xl border border-[#1e2e4a] shadow-sm">
@@ -146,7 +248,11 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
                 </div>
               ) : (
                 <>
-                  <UploadCloud className="mx-auto h-10 w-10 text-slate-500" />
+                  <UploadCloud
+                    className={`mx-auto h-10 w-10 transition-colors ${
+                      isDragging ? "text-blue-400 animate-bounce" : "text-slate-500"
+                    }`}
+                  />
                   <div className="flex text-xs text-slate-300 justify-center items-center gap-1">
                     <label
                       htmlFor="file-upload"
@@ -175,16 +281,36 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         </div>
       </div>
 
+      {/* Upload progress banner */}
+      {isUploading && uploadStep && (
+        <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl space-y-2">
+          <div className="flex items-center gap-2 text-xs font-semibold text-blue-300">
+            <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+            <span>{uploadStep}</span>
+          </div>
+          <div className="w-full bg-[#182338] h-1.5 rounded-full overflow-hidden">
+            <div className="bg-blue-500 h-full rounded-full animate-pulse w-3/4 transition-all duration-500" />
+          </div>
+        </div>
+      )}
+
       <div className="pt-2 flex justify-end">
         <button
           type="submit"
-          disabled={!file || !agentId || !frameworkId || isUploading}
-          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-blue-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
+          disabled={
+            !file ||
+            !agentId ||
+            !frameworkId ||
+            isUploading ||
+            missingAgents ||
+            missingFrameworks
+          }
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-blue-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isUploading ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Uploading & Starting QA...
+              Uploading Recording...
             </>
           ) : (
             <>
