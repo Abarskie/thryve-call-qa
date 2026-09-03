@@ -1,13 +1,18 @@
 import { CallsDirectory } from "@/components/calls/calls-directory";
 import { getDashboardDataAction } from "@/app/actions/calls";
+import { getSettingsAction } from "@/app/actions/settings";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 
 export const revalidate = 0;
 
 export default async function CallsDirectoryPage() {
-  const result = await getDashboardDataAction();
+  const [result, settingsRes] = await Promise.all([
+    getDashboardDataAction(),
+    getSettingsAction().catch(() => null),
+  ]);
   const calls = result.success && result.data ? result.data.recentCalls : [];
+  const passingThreshold = settingsRes?.data?.passingThreshold ?? 75;
 
   return (
     <div className="flex min-h-screen bg-[#0b1320] text-slate-100">
@@ -35,7 +40,7 @@ export default async function CallsDirectoryPage() {
           </div>
 
           {/* Interactive Calls Directory Table & Filters */}
-          <CallsDirectory initialCalls={calls} />
+          <CallsDirectory initialCalls={calls} passingThreshold={passingThreshold} />
         </div>
       </main>
     </div>

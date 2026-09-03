@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { validateAudioUploadFile } from "@/lib/audio-upload";
 import { formatUnknownError } from "@/lib/errors";
+import { getStorageObjectPath } from "@/lib/call-processing/repository";
+import { getSettingsAction } from "@/app/actions/settings";
 import type { CallStatus } from "@/types/database";
 
 export interface DashboardCall {
@@ -146,12 +148,16 @@ export async function getDashboardDataAction(): Promise<{
       call_analyses: { overall_score: number }[] | { overall_score: number } | null;
     };
 
+    const settingsRes = await getSettingsAction().catch(() => null);
+    const threshold = settingsRes?.data?.passingThreshold ?? 75;
+    const partialThreshold = Math.round(threshold * 0.8);
+
     const formattedCalls: DashboardCall[] = ((calls || []) as unknown as RawCall[]).map((c) => {
       const analysis = Array.isArray(c.call_analyses) ? c.call_analyses[0] : c.call_analyses;
       const score = analysis?.overall_score ?? null;
       let status = c.status?.toUpperCase() || "PENDING";
       if (score !== null) {
-        status = score >= 75 ? "PASS" : score >= 60 ? "PARTIAL" : "FAIL";
+        status = score >= threshold ? "PASS" : score >= partialThreshold ? "PARTIAL" : "FAIL";
       }
 
       return {
@@ -200,5 +206,64 @@ export async function getDashboardDataAction(): Promise<{
         recentCalls: [],
       },
     };
+  }
+}
+
+/**
+ * Deletes a call, its associated audio from Supabase Storage, and cascades to transcripts and analyses.
+ */
+export async function deleteCallAction(callId: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    if (!callId) {
+      return { success: false, error: "Call ID is required." };
+    }
+
+    const supabase = createAdminClient();
+
+    // 1. Fetch audio_url to remove file from storage
+    const { data: call, error: fetchError } = await supabase
+      .from("calls")
+      .select("audio_url")
+      .eq("id", callId)
+      .maybeSingle();
+
+    if (fetchError) {
+      return { success: false, error: fetchError.message };
+    }
+
+    // 2. Clean up audio file from Storage bucket if exists
+    if (call?.audio_url) {
+      try {
+        const path = getStorageObjectPath(call.audio_url);
+        await supabase.storage.from("call-recordings").remove([path]);
+      } catch (storageErr) {
+        console.warn(`Failed to delete audio file from storage: ${storageErr}`);
+      }
+    }
+
+    // 3. Delete call row from database (cascades to transcripts & call_analyses)
+    const { error: deleteError } = await supabase
+      .from("calls")
+      .delete()
+      .eq("id", callId);
+
+    if (deleteError) {
+      return { success: false, error: deleteError.message };
+    }
+
+    try {
+      revalidatePath("/calls");
+      revalidatePath("/");
+    } catch {
+      // Ignored outside Next.js request context (e.g. tests)
+    }
+
+    return { success: true };
+  } catch (err: unknown) {
+    const message = formatUnknownError(err, "Failed to delete call.");
+    return { success: false, error: message };
   }
 }

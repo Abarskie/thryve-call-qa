@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { type AgentWithStats, toggleAgentStatusAction } from "@/app/actions/agents";
 import { AgentModal } from "@/components/agents/agent-modal";
 import {
@@ -25,6 +25,10 @@ export function AgentTable({ initialAgents }: AgentTableProps) {
   const [selectedAgent, setSelectedAgent] = useState<AgentWithStats | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    setAgents(initialAgents);
+  }, [initialAgents]);
 
   // Filter agents by search query
   const filteredAgents = agents.filter(

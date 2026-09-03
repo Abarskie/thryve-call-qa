@@ -24,3 +24,4 @@ CREATE TRIGGER update_workspace_settings_updated_at
 INSERT INTO workspace_settings (id, company_name, manager_email, default_model, passing_threshold)
 SELECT '00000000-0000-0000-0000-000000000001', 'Thryve Call QA', 'manager@thryve.qa', 'gpt-4o-mini', 75
 WHERE NOT EXISTS (SELECT 1 FROM workspace_settings);
+

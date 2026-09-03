@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   type FrameworkWithStats,
   duplicateFrameworkAction,
   toggleFrameworkStatusAction,
 } from "@/app/actions/frameworks";
+import type { Stage } from "@/types/database";
 import {
   Search,
   Plus,
@@ -26,10 +28,15 @@ interface FrameworkListProps {
 }
 
 export function FrameworkList({ initialFrameworks }: FrameworkListProps) {
-  const [frameworks] = useState<FrameworkWithStats[]>(initialFrameworks);
+  const router = useRouter();
+  const [frameworks, setFrameworks] = useState<FrameworkWithStats[]>(initialFrameworks);
   const [searchQuery, setSearchQuery] = useState("");
   const [actingId, setActingId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+
+  useEffect(() => {
+    setFrameworks(initialFrameworks);
+  }, [initialFrameworks]);
 
   const filteredFrameworks = frameworks.filter(
     (fw) =>
@@ -41,15 +48,35 @@ export function FrameworkList({ initialFrameworks }: FrameworkListProps) {
   function handleDuplicate(id: string) {
     setActingId(`dup-${id}`);
     startTransition(async () => {
-      await duplicateFrameworkAction(id);
+      const res = await duplicateFrameworkAction(id);
+      if (res.success && res.data) {
+        const rawStages = Array.isArray(res.data.stages) ? (res.data.stages as unknown as Stage[]) : [];
+        const reqCount = rawStages.reduce(
+          (sum, s) => sum + (Array.isArray(s.requirements) ? s.requirements.length : 0),
+          0
+        );
+        const newFw: FrameworkWithStats = {
+          ...res.data,
+          stages_count: rawStages.length,
+          requirements_count: reqCount,
+          total_weight: 100,
+        };
+        setFrameworks((prev) => [newFw, ...prev]);
+      }
+      router.refresh();
       setActingId(null);
     });
   }
 
   function handleToggleStatus(fw: FrameworkWithStats) {
     setActingId(`toggle-${fw.id}`);
+    // Optimistic toggle
+    setFrameworks((prev) =>
+      prev.map((f) => (f.id === fw.id ? { ...f, active: !fw.active } : f))
+    );
     startTransition(async () => {
       await toggleFrameworkStatusAction(fw.id, fw.active);
+      router.refresh();
       setActingId(null);
     });
   }

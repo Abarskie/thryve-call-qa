@@ -2,8 +2,10 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { CallReviewData } from "@/lib/call-processing/query";
 import { isStaleCall } from "@/lib/call-processing/scoring";
+import { deleteCallAction } from "@/app/actions/calls";
 import { CallReport } from "./call-report";
 import {
   Loader2,
@@ -11,6 +13,7 @@ import {
   RefreshCw,
   XCircle,
   Settings,
+  Trash2,
 } from "lucide-react";
 
 interface CallReviewProps {
@@ -34,12 +37,39 @@ export function CallReview({
   now: initialNow,
   passingThreshold = 75,
 }: CallReviewProps) {
+  const router = useRouter();
   const [call, setCall] = useState<CallReviewData>(initialCall);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [isStopping, setIsStopping] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const isPollingRef = useRef(false);
   const triggeredInitialProcess = useRef(false);
+
+  const handleDelete = async () => {
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        "Are you sure you want to delete this call recording? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      const res = await deleteCallAction(call.id);
+      if (res.success) {
+        router.push("/calls");
+      } else {
+        alert(res.error || "Failed to delete call recording.");
+        setIsDeleting(false);
+      }
+    } catch (err) {
+      console.error("Failed to delete call:", err);
+      alert("Failed to delete call recording.");
+      setIsDeleting(false);
+    }
+  };
 
   const currentDate = initialNow ? new Date(initialNow) : new Date();
   const isStale = isStaleCall(call.status, call.updatedAt, currentDate);
@@ -244,6 +274,20 @@ export function CallReview({
                   Configure API Key
                 </Link>
               )}
+
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Trash2 className="h-3.5 w-3.5" />
+                )}
+                Delete Recording
+              </button>
             </div>
           </div>
         ) : (
