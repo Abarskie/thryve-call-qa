@@ -11,6 +11,8 @@ import {
   Users,
   ShieldAlert,
   Clock,
+  GitFork,
+  ChevronRight,
 } from "lucide-react";
 
 export const revalidate = 0;
@@ -21,82 +23,95 @@ export default async function Home() {
 
   const stats = [
     {
-      name: "Average Call Score",
+      name: "Average Quality Score",
       value: averageScore !== null ? `${averageScore}%` : "—",
-      sub: averageScore !== null ? "Across evaluated calls" : "No calls scored yet",
+      sub: averageScore !== null ? "Across evaluated recordings" : "Awaiting first scored call",
       icon: Award,
-      bg: "bg-blue-500/10 text-blue-400 border border-blue-500/20",
+      badge: averageScore !== null && averageScore >= 75 ? "Target met" : null,
+      accent: "text-blue-400 bg-blue-500/10 border-blue-500/20",
     },
     {
-      name: "Calls Analyzed",
+      name: "Calls Evaluated",
       value: totalCalls.toString(),
-      sub: "Total uploaded recordings",
+      sub: "Total recordings ingested",
       icon: Activity,
-      bg: "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20",
+      badge: totalCalls > 0 ? "Live" : null,
+      accent: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
     },
     {
-      name: "Active Sales Agents",
+      name: "Monitored Agents",
       value: activeAgents.toString(),
-      sub: "Monitored for QA compliance",
+      sub: "Active sales representatives",
       icon: Users,
-      bg: "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20",
+      badge: null,
+      accent: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20",
     },
   ];
 
   return (
     <div className="flex min-h-screen bg-[#0b1320] text-slate-100">
-      {/* Admina Dark Navy Sidebar */}
+      {/* Responsive Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <div className="p-8 space-y-7 flex-1">
+      <main className="flex-1 flex flex-col min-w-0 pt-16 md:pt-0 overflow-y-auto">
+        <div className="p-6 md:p-8 space-y-7 flex-1">
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl font-bold text-white tracking-tight">
-                Dashboard Overview
+              <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+                Quality Assurance Overview
               </h1>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-400 mt-1">
                 Real-time sales call QA scoring, compliance monitoring & coaching insights
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
+              <Link
+                href="/frameworks"
+                prefetch={true}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#131e32] hover:bg-[#182338] text-slate-300 hover:text-white border border-[#1e2e4a] transition-all"
+              >
+                <GitFork className="h-3.5 w-3.5 text-slate-400" />
+                Frameworks
+              </Link>
               <Link
                 href="/calls/upload"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                prefetch={true}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
-                <FileAudio className="h-4 w-4" />
-                Upload Call Recording
+                <FileAudio className="h-3.5 w-3.5" />
+                Upload Recording
               </Link>
             </div>
           </div>
 
-          {/* Admina Dark Stat Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* Metrics Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {stats.map((stat) => {
               const Icon = stat.icon;
               return (
                 <div
                   key={stat.name}
-                  className="bg-[#131e32] border border-[#1e2e4a] rounded-2xl p-6 shadow-sm hover:border-slate-700 transition-colors flex items-center gap-4"
+                  className="bg-[#131e32] border border-[#1e2e4a] rounded-2xl p-5 shadow-sm hover:border-slate-700/80 transition-colors flex items-center justify-between"
                 >
-                  <div
-                    className={`h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 ${stat.bg} shadow-inner`}
-                  >
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 block">
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
                       {stat.name}
                     </span>
-                    <div className="mt-1 text-2xl font-bold text-white tabular-nums">
+                    <div className="text-2xl md:text-3xl font-bold text-white tabular-nums tracking-tight">
                       {stat.value}
                     </div>
-                    <span className="text-[11px] text-slate-500 font-medium">
+                    <span className="text-[11px] text-slate-500 font-medium block">
                       {stat.sub}
                     </span>
+                  </div>
+
+                  <div
+                    className={`h-12 w-12 rounded-xl flex items-center justify-center shrink-0 border ${stat.accent}`}
+                  >
+                    <Icon className="h-5 w-5" />
                   </div>
                 </div>
               );
@@ -105,18 +120,19 @@ export default async function Home() {
 
           {/* Recent Calls Section */}
           <div className="bg-[#131e32] border border-[#1e2e4a] rounded-2xl shadow-sm overflow-hidden">
-            <div className="px-6 py-5 border-b border-[#1e2e4a] flex items-center justify-between">
+            <div className="px-6 py-4.5 border-b border-[#1e2e4a] flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-bold text-white">
-                  Recent Evaluated Calls
+                  Recent Call Reviews
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Latest agent recordings evaluated against quality frameworks
+                  Latest agent recordings evaluated against QA frameworks
                 </p>
               </div>
               <Link
                 href="/calls"
-                className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 transition-colors focus-visible:outline-none focus-visible:underline"
+                prefetch={true}
+                className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 transition-colors"
               >
                 View all calls
                 <ArrowUpRight className="h-3.5 w-3.5" />
@@ -125,18 +141,19 @@ export default async function Home() {
 
             {recentCalls.length === 0 ? (
               <div className="py-16 text-center text-slate-400 px-6">
-                <div className="h-14 w-14 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center mx-auto mb-3">
-                  <FileAudio className="h-7 w-7" />
+                <div className="h-12 w-12 rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center mx-auto mb-3">
+                  <FileAudio className="h-6 w-6" />
                 </div>
                 <p className="font-semibold text-white text-sm">
                   No call recordings evaluated yet
                 </p>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-5 leading-relaxed">
-                  Upload an audio recording to transcribe the dialogue and evaluate quality compliance with AI.
+                  Upload an audio file to automatically transcribe dialogue, evaluate quality compliance, and generate coaching notes.
                 </p>
                 <Link
                   href="/calls/upload"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors shadow-md shadow-blue-600/30"
+                  prefetch={true}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-xl transition-colors shadow-md shadow-blue-600/30"
                 >
                   <FileAudio className="h-3.5 w-3.5" />
                   Upload First Call
@@ -146,41 +163,42 @@ export default async function Home() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="border-b border-[#1e2e4a] bg-[#0e1726]/60 text-slate-400 font-semibold uppercase tracking-wider">
-                      <th className="py-3.5 px-6">Agent</th>
-                      <th className="py-3.5 px-6">Framework</th>
-                      <th className="py-3.5 px-6">Date</th>
-                      <th className="py-3.5 px-6">QA Score</th>
-                      <th className="py-3.5 px-6">Status</th>
+                    <tr className="border-b border-[#1e2e4a] bg-[#0e1726]/80 text-slate-400 font-semibold uppercase tracking-wider">
+                      <th className="py-3 px-6">Sales Agent</th>
+                      <th className="py-3 px-6">Framework Playbook</th>
+                      <th className="py-3 px-6">Date</th>
+                      <th className="py-3 px-6">QA Score</th>
+                      <th className="py-3 px-6">Compliance</th>
+                      <th className="py-3 px-4 text-right">Review</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#1e2e4a]/60 text-slate-300">
                     {recentCalls.map((call) => (
                       <tr
                         key={call.id}
-                        className="hover:bg-[#182338]/60 transition-colors group"
+                        className="hover:bg-[#182338]/80 transition-colors group cursor-pointer"
                       >
-                        <td className="py-3.5 px-6 font-medium text-white flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-full bg-[#182338] border border-[#1e2e4a] flex items-center justify-center text-xs text-blue-400 font-bold">
-                            {call.agentName.charAt(0)}
-                          </div>
-                          <span className="font-semibold text-white">
-                            {call.agentName}
-                          </span>
+                        <td className="py-3 px-6 font-medium text-white">
+                          <Link href={`/calls/${call.id}`} className="flex items-center gap-2.5 group-hover:text-blue-400 transition-colors">
+                            <div className="h-7 w-7 rounded-full bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-xs text-blue-400 font-bold">
+                              {call.agentName.charAt(0)}
+                            </div>
+                            <span className="font-semibold">{call.agentName}</span>
+                          </Link>
                         </td>
-                        <td className="py-3.5 px-6 text-slate-300 font-medium">
+                        <td className="py-3 px-6 text-slate-300 font-medium">
                           {call.frameworkName}
                         </td>
-                        <td className="py-3.5 px-6 text-slate-400 text-xs">
+                        <td className="py-3 px-6 text-slate-400 text-xs font-mono">
                           {call.createdAt}
                         </td>
-                        <td className="py-3.5 px-6 font-semibold">
+                        <td className="py-3 px-6 font-semibold">
                           {call.score !== null ? (
                             <span
                               className={`tabular-nums text-sm font-bold ${
-                                call.score >= 80
+                                call.score >= 75
                                   ? "text-emerald-400"
-                                  : call.score >= 70
+                                  : call.score >= 60
                                   ? "text-amber-400"
                                   : "text-rose-400"
                               }`}
@@ -191,9 +209,9 @@ export default async function Home() {
                             <span className="text-slate-500 font-normal">—</span>
                           )}
                         </td>
-                        <td className="py-3.5 px-6">
+                        <td className="py-3 px-6">
                           <span
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ${
                               call.status === "PASS"
                                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                                 : call.status === "PARTIAL"
@@ -218,6 +236,15 @@ export default async function Home() {
                             {call.status}
                           </span>
                         </td>
+                        <td className="py-3 px-4 text-right">
+                          <Link
+                            href={`/calls/${call.id}`}
+                            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 group-hover:text-blue-400 transition-colors"
+                          >
+                            View
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          </Link>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -230,3 +257,4 @@ export default async function Home() {
     </div>
   );
 }
+

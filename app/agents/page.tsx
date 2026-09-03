@@ -50,8 +50,8 @@ export default async function AgentsPage() {
     <div className="flex min-h-screen bg-[#0b1320] text-slate-100">
       <Sidebar />
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <div className="p-8 space-y-7 flex-1">
+      <main className="flex-1 flex flex-col min-w-0 pt-16 md:pt-0 overflow-y-auto">
+        <div className="p-6 md:p-8 space-y-7 flex-1">
           {/* Page Header */}
           <div>
             <h1 className="text-xl font-bold text-white tracking-tight">
