@@ -19,6 +19,7 @@ const eslintConfig = [
       ".superpowers/**",
       "supabase/**",
       "scripts/**",
+      ".worktrees/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

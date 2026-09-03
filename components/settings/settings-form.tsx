@@ -27,9 +27,9 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
   const [companyName, setCompanyName] = useState(initialSettings.companyName);
   const [managerEmail, setManagerEmail] = useState(initialSettings.managerEmail);
-  const [defaultModel, setDefaultModel] = useState<"gpt-4o-mini" | "gpt-4o">(
-    initialSettings.defaultModel
-  );
+  const [defaultModel, setDefaultModel] = useState<
+    "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash"
+  >(initialSettings.defaultModel);
   const [passingThreshold, setPassingThreshold] = useState(
     initialSettings.passingThreshold
   );
@@ -37,6 +37,10 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     initialSettings.openaiApiKey || ""
   );
   const [showApiKey, setShowApiKey] = useState(false);
+  const [geminiApiKey, setGeminiApiKey] = useState(
+    initialSettings.geminiApiKey || ""
+  );
+  const [showGeminiApiKey, setShowGeminiApiKey] = useState(false);
 
   const [isPending, startTransition] = useTransition();
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
@@ -54,6 +58,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
         defaultModel,
         passingThreshold: Number(passingThreshold),
         openaiApiKey,
+        geminiApiKey,
       });
 
       if (result.success) {
@@ -188,7 +193,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Default Evaluation Model
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* GPT-4o-mini Card */}
                 <div
                   onClick={() => setDefaultModel("gpt-4o-mini")}
@@ -204,11 +209,35 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                         GPT-4o-mini
                       </span>
                       <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
-                        Recommended
+                        Fast & Cheap
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      Fast evaluation (~1-2s), cost-effective. Perfect for high-volume sales QA checklists.
+                      Fast evaluation (~1-2s), cost-effective OpenAI model. Perfect for standard sales QA checklists.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Gemini 2.0 Flash Card */}
+                <div
+                  onClick={() => setDefaultModel("gemini-2.0-flash")}
+                  className={`cursor-pointer rounded-2xl border p-5 transition-all flex flex-col justify-between ${
+                    defaultModel === "gemini-2.0-flash"
+                      ? "border-blue-500 bg-blue-600/10 ring-1 ring-blue-500"
+                      : "border-[#1e2e4a] hover:border-slate-600 bg-[#0e1726]"
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-white text-sm">
+                        Gemini 2.0 Flash
+                      </span>
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-semibold">
+                        Free Tier
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                      Google&apos;s fastest multimodal model. Free tier available via Google AI Studio with native speed and accuracy.
                     </p>
                   </div>
                 </div>
@@ -321,6 +350,61 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
               <p className="text-[11px] text-slate-500 mt-1.5">
                 Stored safely on the server. Never exposed to the browser.
               </p>
+            </div>
+
+            {/* Google Gemini API Key */}
+            <div className="pt-4 border-t border-[#1e2e4a]">
+              <div>
+                <h3 className="text-base font-bold text-white">
+                  Google Gemini API Credentials
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Free tier API key from Google AI Studio. Used for Gemini 2.0 Flash evaluations.
+                </p>
+              </div>
+
+              <div className="pt-3">
+                <label
+                  htmlFor="geminiApiKey"
+                  className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+                >
+                  Google Gemini API Key
+                </label>
+                <div className="relative">
+                  <input
+                    id="geminiApiKey"
+                    type={showGeminiApiKey ? "text" : "password"}
+                    value={geminiApiKey}
+                    onChange={(e) => setGeminiApiKey(e.target.value)}
+                    placeholder="AIzaSy..."
+                    className="w-full pl-3.5 pr-10 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-xs text-white font-mono placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowGeminiApiKey(!showGeminiApiKey)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-500 hover:text-white rounded"
+                    title={showGeminiApiKey ? "Hide API key" : "Show API key"}
+                  >
+                    {showGeminiApiKey ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  Obtain your free key at{" "}
+                  <a
+                    href="https://aistudio.google.com/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-400 hover:underline"
+                  >
+                    aistudio.google.com
+                  </a>
+                  . Stored server-side only.
+                </p>
+              </div>
             </div>
           </div>
         )}

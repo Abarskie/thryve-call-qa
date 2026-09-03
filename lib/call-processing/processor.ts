@@ -3,7 +3,11 @@ import {
   type CallProcessingRepository,
   createCallProcessingRepository,
 } from "./repository";
-import { type Transcriber, createOpenAITranscriber } from "./transcription";
+import {
+  type Transcriber,
+  createOpenAITranscriber,
+  createGeminiTranscriber,
+} from "./transcription";
 import { type Evaluator, createOpenAIEvaluator } from "./evaluation";
 import type { ProcessCallResult } from "./types";
 
@@ -13,8 +17,9 @@ export interface ProcessCallInput {
 }
 
 export interface ProcessorDependencies {
-  apiKey: string;
-  evaluationModel: "gpt-4o-mini" | "gpt-4o";
+  apiKey?: string;
+  geminiApiKey?: string;
+  evaluationModel?: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash";
   repository: CallProcessingRepository;
   transcriber: Transcriber;
   evaluator: Evaluator;
@@ -25,27 +30,42 @@ export async function processCall(
   input: ProcessCallInput,
   dependencies?: ProcessorDependencies
 ): Promise<ProcessCallResult> {
-  const apiKey = dependencies?.apiKey ?? (process.env.OPENAI_API_KEY || "");
-
-  if (!apiKey || apiKey.trim().length === 0) {
-    return {
-      outcome: "not_configured",
-      message: "OpenAI is not configured.",
-    };
-  }
-
   let evaluationModel = dependencies?.evaluationModel;
   if (!evaluationModel) {
     const settings = await getSettingsAction();
     evaluationModel = settings.data?.defaultModel ?? "gpt-4o-mini";
   }
 
+  const apiKey = dependencies?.apiKey ?? (process.env.OPENAI_API_KEY || "");
+  const geminiApiKey =
+    dependencies?.geminiApiKey ?? (process.env.GEMINI_API_KEY || "");
+
+  const isGemini = evaluationModel === "gemini-2.0-flash";
+
+  if (isGemini && !geminiApiKey && !apiKey) {
+    return {
+      outcome: "not_configured",
+      message: "Gemini API key is not configured.",
+    };
+  }
+
+  if (!isGemini && !apiKey) {
+    return {
+      outcome: "not_configured",
+      message: "OpenAI is not configured.",
+    };
+  }
+
   const repository =
     dependencies?.repository ?? createCallProcessingRepository();
   const transcriber =
-    dependencies?.transcriber ?? createOpenAITranscriber(apiKey);
+    dependencies?.transcriber ??
+    (apiKey
+      ? createOpenAITranscriber(apiKey)
+      : createGeminiTranscriber(geminiApiKey));
   const evaluator =
-    dependencies?.evaluator ?? createOpenAIEvaluator(apiKey);
+    dependencies?.evaluator ??
+    createOpenAIEvaluator(apiKey, geminiApiKey);
   const now = dependencies?.now ?? (() => new Date());
 
   const claimResult = await repository.claim(input.callId, input.retry, now());
@@ -108,3 +128,4 @@ export async function processCall(
     };
   }
 }
+

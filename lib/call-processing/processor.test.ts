@@ -191,6 +191,15 @@ test("processor unit tests", async (t) => {
     assert.equal(mock.evaluationInputs[0].model, "gpt-4o");
   });
 
+  await t.test("passes gemini-2.0-flash to the evaluator with geminiApiKey", async () => {
+    const mock = createMockDeps();
+    await processCall(
+      { callId: "call-1", retry: false },
+      { ...mock.deps, apiKey: "", geminiApiKey: "AIza-test", evaluationModel: "gemini-2.0-flash" }
+    );
+    assert.equal(mock.evaluationInputs[0].model, "gemini-2.0-flash");
+  });
+
   await t.test("handles evaluation failure safely", async () => {
     const mock = createMockDeps();
     mock.setEvaluatorError(new Error("Evaluation error with sensitive token"));

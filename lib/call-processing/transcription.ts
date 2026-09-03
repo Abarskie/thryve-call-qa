@@ -113,3 +113,58 @@ export function createOpenAITranscriber(apiKey: string): Transcriber {
     return normalizeDiarizedTranscription(response);
   };
 }
+
+export function createGeminiTranscriber(apiKey: string): Transcriber {
+  return async (input: AudioInput): Promise<TranscriptionResult> => {
+    const arrayBuffer = await input.blob.arrayBuffer();
+    const base64Audio = Buffer.from(arrayBuffer).toString("base64");
+    const mimeType = input.contentType || "audio/mp3";
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  inlineData: {
+                    mimeType,
+                    data: base64Audio,
+                  },
+                },
+                {
+                  text: `Transcribe this audio recording with speaker diarization.
+Return a valid JSON object with:
+- text: full transcript string
+- duration: total duration in seconds as a number
+- segments: array of objects with { id: string, type: "transcript.text.segment", speaker: string (e.g. "A", "B"), start: number, end: number, text: string }`,
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Gemini audio transcription failed: ${errText}`);
+    }
+
+    const data = await res.json();
+    const textContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!textContent) {
+      throw new Error("Empty transcription from Gemini.");
+    }
+
+    const parsed = JSON.parse(textContent);
+    return normalizeDiarizedTranscription(parsed);
+  };
+}
+

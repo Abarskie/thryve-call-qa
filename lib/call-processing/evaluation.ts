@@ -11,7 +11,7 @@ export interface EvaluationInput {
   frameworkName: string;
   stages: Stage[];
   transcript: TranscriptionResult;
-  model?: "gpt-4o-mini" | "gpt-4o";
+  model?: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash";
 }
 
 export type Evaluator = (input: EvaluationInput) => Promise<ValidatedEvaluation>;
@@ -177,10 +177,25 @@ export function validateEvaluationDraft(
   };
 }
 
-export function createOpenAIEvaluator(apiKey: string): Evaluator {
-  const openai = new OpenAI({ apiKey });
+export function createOpenAIEvaluator(
+  apiKey: string,
+  geminiApiKey?: string
+): Evaluator {
+  const defaultClient = new OpenAI({ apiKey: apiKey || "placeholder" });
 
   return async (input: EvaluationInput): Promise<ValidatedEvaluation> => {
+    const isGemini = input.model === "gemini-2.0-flash";
+    const effectiveKey = isGemini
+      ? geminiApiKey || process.env.GEMINI_API_KEY || apiKey
+      : apiKey;
+
+    const client = isGemini
+      ? new OpenAI({
+          apiKey: effectiveKey,
+          baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
+        })
+      : defaultClient;
+
     const prompt = `You are an expert sales call quality assurance auditor.
 Evaluate the call transcript against the provided QA Framework.
 
@@ -220,7 +235,7 @@ Strict instructions:
 7. Do not infer roles without evidence.
 `;
 
-    const response = await openai.chat.completions.create({
+    const response = await client.chat.completions.create({
       model: input.model ?? "gpt-4o-mini",
       temperature: 0.1,
       messages: [{ role: "user", content: prompt }],

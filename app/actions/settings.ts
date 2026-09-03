@@ -5,9 +5,10 @@ import { revalidatePath } from "next/cache";
 export interface WorkspaceSettings {
   companyName: string;
   managerEmail: string;
-  defaultModel: "gpt-4o-mini" | "gpt-4o";
+  defaultModel: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash";
   passingThreshold: number;
   openaiApiKey: string;
+  geminiApiKey: string;
 }
 
 // In-memory / server-cached default state for settings
@@ -17,6 +18,7 @@ let cachedSettings: WorkspaceSettings = {
   defaultModel: "gpt-4o-mini",
   passingThreshold: 75,
   openaiApiKey: process.env.OPENAI_API_KEY ? "sk-••••••••••••••••••••••••" : "",
+  geminiApiKey: process.env.GEMINI_API_KEY ? "AIza••••••••••••••••••••••••" : "",
 };
 
 /**
