@@ -33,6 +33,8 @@ The platform allows businesses to define required call structures, upload agent 
 
 ## Development Rules
 
+- **Language**: Always respond and communicate strictly in **English**.
+- **Full Access / Autonomous Execution**: Operate in full access mode. Execute necessary terminal commands, file edits, and tool steps directly without asking for confirmation on routine operations.
 - **Superpowers First**: Always load and adhere to the relevant Superpowers skill before touching code or proposing solutions.
 - **Strict Prompt Fidelity**: Only touch and change what the user explicitly requested. Never invent new code, features, or design changes beyond the prompt.
 - Plan features before implementing them.
