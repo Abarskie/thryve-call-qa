@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import React, { useState, useTransition } from "react";
 import {
   type WorkspaceSettings,
   updateSettingsAction,
@@ -332,6 +332,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={openaiApiKey}
                   onChange={(e) => setOpenaiApiKey(e.target.value)}
                   placeholder="sk-proj-..."
+                  required={defaultModel !== "gemini-2.0-flash"}
                   className="w-full pl-3.5 pr-10 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-xs text-white font-mono placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
                 />
                 <button
@@ -377,6 +378,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                     value={geminiApiKey}
                     onChange={(e) => setGeminiApiKey(e.target.value)}
                     placeholder="AIzaSy..."
+                    required={defaultModel === "gemini-2.0-flash"}
                     className="w-full pl-3.5 pr-10 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-xs text-white font-mono placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
                   />
                   <button

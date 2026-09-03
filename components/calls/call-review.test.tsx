@@ -125,3 +125,12 @@ test("polls only healthy active calls", () => {
   assert.equal(shouldPollCall(completedCall, new Date(NOW)), false);
 });
 
+test("renders Stop Processing button for active calls", () => {
+  const html = renderToStaticMarkup(<CallReview initialCall={transcribingCall} now={NOW} />);
+  assert.match(html, /Stop Processing/i);
+});
+
+test("does not render Stop Processing button for failed calls", () => {
+  const html = renderToStaticMarkup(<CallReview initialCall={failedCall} now={NOW} />);
+  assert.doesNotMatch(html, /Stop Processing/i);
+});

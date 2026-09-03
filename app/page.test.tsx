@@ -25,3 +25,4 @@ test("Home does not render a duplicate Sidebar", async () => {
   const homeElement = await Home();
   assert.equal(countElementsOfType(homeElement, Sidebar), 0);
 });
+

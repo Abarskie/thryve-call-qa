@@ -8,6 +8,7 @@ import {
   Loader2,
   AlertCircle,
   RefreshCw,
+  XCircle,
 } from "lucide-react";
 
 interface CallReviewProps {
@@ -29,6 +30,7 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
   const [call, setCall] = useState<CallReviewData>(initialCall);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [isStopping, setIsStopping] = useState(false);
   const isPollingRef = useRef(false);
   const triggeredInitialProcess = useRef(false);
 
@@ -56,6 +58,31 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
       isPollingRef.current = false;
     }
   }, [call.id]);
+
+  // Handle stop click
+  const handleStop = async () => {
+    setIsStopping(true);
+    setRequestError(null);
+
+    try {
+      const res = await fetch(`/api/calls/${call.id}/stop`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        setRequestError(json.message || json.error || "Failed to stop processing.");
+      } else {
+        await pollStatus();
+      }
+    } catch {
+      setRequestError("Network error while stopping processing.");
+    } finally {
+      setIsStopping(false);
+    }
+  };
 
   // Handle retry click
   const handleRetry = async () => {
@@ -218,6 +245,22 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
               <span className="text-[11px] font-mono text-slate-400 bg-[#0e1726] px-3 py-1.5 rounded-xl border border-[#1e2e4a]">
                 File: {call.fileName}
               </span>
+            </div>
+
+            <div className="pt-4">
+              <button
+                type="button"
+                onClick={handleStop}
+                disabled={isStopping}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-semibold bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 border border-rose-500/20 transition-all disabled:opacity-50"
+              >
+                {isStopping ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <XCircle className="h-3.5 w-3.5" />
+                )}
+                Stop Processing
+              </button>
             </div>
           </div>
         )}
