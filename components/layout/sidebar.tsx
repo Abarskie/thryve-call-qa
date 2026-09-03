@@ -11,7 +11,9 @@ import {
   Settings,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
+import { signOutAction } from "@/app/actions/auth";
 
 export function Sidebar() {
   const pathname = usePathname() || "";
@@ -138,8 +140,8 @@ export function Sidebar() {
           })}
         </nav>
 
-        {/* Bottom Workspace Status */}
-        <div className="p-3.5 border-t border-[#1e2e4a]">
+        {/* Bottom Workspace Status & Sign Out */}
+        <div className="p-3.5 border-t border-[#1e2e4a] space-y-2.5">
           <div className="p-3 rounded-xl bg-[#131e32] border border-[#1e2e4a]/80 text-xs">
             <div className="flex items-center gap-2 text-slate-300 font-semibold mb-1">
               <span className="relative flex h-2 w-2">
@@ -152,6 +154,16 @@ export function Sidebar() {
               OpenAI Whisper & Framework scoring ready.
             </p>
           </div>
+
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent transition-all"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Sign Out</span>
+            </button>
+          </form>
         </div>
       </aside>
     </>
