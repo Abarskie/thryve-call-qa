@@ -123,3 +123,4 @@ export async function getCurrentUser(): Promise<{
     return null;
   }
 }
+

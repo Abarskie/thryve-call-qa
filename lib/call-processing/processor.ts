@@ -19,7 +19,7 @@ export interface ProcessCallInput {
 export interface ProcessorDependencies {
   apiKey?: string;
   geminiApiKey?: string;
-  evaluationModel?: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash";
+  evaluationModel?: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash" | "gemini-3.6-flash";
   repository: CallProcessingRepository;
   transcriber: Transcriber;
   evaluator: Evaluator;
@@ -45,7 +45,10 @@ export async function processCall(
     dependencies?.geminiApiKey ??
     (rawSettings?.rawGeminiApiKey || (process.env.GEMINI_API_KEY || ""));
 
-  const isGemini = evaluationModel === "gemini-2.0-flash";
+  const isGemini =
+    evaluationModel === "gemini-2.0-flash" ||
+    evaluationModel === "gemini-3.6-flash" ||
+    evaluationModel?.startsWith("gemini");
 
   if (isGemini && !geminiApiKey && !apiKey) {
     return {
@@ -65,7 +68,9 @@ export async function processCall(
     dependencies?.repository ?? createCallProcessingRepository();
   const transcriber =
     dependencies?.transcriber ??
-    (apiKey
+    (isGemini && geminiApiKey
+      ? createGeminiTranscriber(geminiApiKey)
+      : apiKey
       ? createOpenAITranscriber(apiKey)
       : createGeminiTranscriber(geminiApiKey));
   const evaluator =

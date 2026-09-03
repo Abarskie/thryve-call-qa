@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export interface WorkspaceSettings {
   companyName: string;
   managerEmail: string;
-  defaultModel: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash";
+  defaultModel: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash" | "gemini-3.6-flash";
   passingThreshold: number;
   openaiApiKey: string;
   geminiApiKey: string;
@@ -53,7 +53,7 @@ export async function getRawWorkspaceSettings(): Promise<RawWorkspaceSettings> {
     companyName: row?.company_name || "Thryve Call QA",
     managerEmail: row?.manager_email || "manager@thryve.qa",
     defaultModel:
-      (row?.default_model as "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash") ||
+      (row?.default_model as "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash" | "gemini-3.6-flash") ||
       "gpt-4o-mini",
     passingThreshold: Number(row?.passing_threshold) || 75,
     openaiApiKey: maskKey(rawOpenaiApiKey),

@@ -28,7 +28,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
   const [companyName, setCompanyName] = useState(initialSettings.companyName);
   const [managerEmail, setManagerEmail] = useState(initialSettings.managerEmail);
   const [defaultModel, setDefaultModel] = useState<
-    "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash"
+    "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash" | "gemini-3.6-flash"
   >(initialSettings.defaultModel);
   const [passingThreshold, setPassingThreshold] = useState(
     initialSettings.passingThreshold
@@ -218,11 +218,11 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   </div>
                 </div>
 
-                {/* Gemini 2.0 Flash Card */}
+                {/* Gemini Flash Card */}
                 <div
-                  onClick={() => setDefaultModel("gemini-2.0-flash")}
+                  onClick={() => setDefaultModel("gemini-3.6-flash")}
                   className={`cursor-pointer rounded-2xl border p-5 transition-all flex flex-col justify-between ${
-                    defaultModel === "gemini-2.0-flash"
+                    defaultModel === "gemini-3.6-flash" || defaultModel === "gemini-2.0-flash"
                       ? "border-blue-500 bg-blue-600/10 ring-1 ring-blue-500"
                       : "border-[#1e2e4a] hover:border-slate-600 bg-[#0e1726]"
                   }`}
@@ -230,14 +230,14 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   <div>
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-white text-sm">
-                        Gemini 2.0 Flash
+                        Gemini Flash (3.6)
                       </span>
                       <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20 font-semibold">
                         Free Tier
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                      Google&apos;s fastest multimodal model. Free tier available via Google AI Studio with native speed and accuracy.
+                      Google&apos;s latest multimodal model. Free tier available via Google AI Studio with native speed, audio transcription, and accuracy.
                     </p>
                   </div>
                 </div>
@@ -332,7 +332,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   value={openaiApiKey}
                   onChange={(e) => setOpenaiApiKey(e.target.value)}
                   placeholder="sk-proj-..."
-                  required={defaultModel !== "gemini-2.0-flash"}
+                  required={defaultModel !== "gemini-2.0-flash" && defaultModel !== "gemini-3.6-flash"}
                   className="w-full pl-3.5 pr-10 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-xs text-white font-mono placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
                 />
                 <button
@@ -360,7 +360,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                   Google Gemini API Credentials
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Free tier API key from Google AI Studio. Used for Gemini 2.0 Flash evaluations.
+                  Free tier API key from Google AI Studio. Used for Gemini Flash evaluations.
                 </p>
               </div>
 
@@ -378,7 +378,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                     value={geminiApiKey}
                     onChange={(e) => setGeminiApiKey(e.target.value)}
                     placeholder="AIzaSy..."
-                    required={defaultModel === "gemini-2.0-flash"}
+                    required={defaultModel === "gemini-2.0-flash" || defaultModel === "gemini-3.6-flash"}
                     className="w-full pl-3.5 pr-10 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-xs text-white font-mono placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
                   />
                   <button

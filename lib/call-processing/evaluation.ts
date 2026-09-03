@@ -11,7 +11,7 @@ export interface EvaluationInput {
   frameworkName: string;
   stages: Stage[];
   transcript: TranscriptionResult;
-  model?: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash";
+  model?: "gpt-4o-mini" | "gpt-4o" | "gemini-2.0-flash" | "gemini-3.6-flash";
 }
 
 export type Evaluator = (input: EvaluationInput) => Promise<ValidatedEvaluation>;
@@ -184,17 +184,10 @@ export function createOpenAIEvaluator(
   const defaultClient = new OpenAI({ apiKey: apiKey || "placeholder" });
 
   return async (input: EvaluationInput): Promise<ValidatedEvaluation> => {
-    const isGemini = input.model === "gemini-2.0-flash";
+    const isGemini = input.model === "gemini-2.0-flash" || input.model === "gemini-3.6-flash" || input.model?.startsWith("gemini");
     const effectiveKey = isGemini
       ? geminiApiKey || process.env.GEMINI_API_KEY || apiKey
       : apiKey;
-
-    const client = isGemini
-      ? new OpenAI({
-          apiKey: effectiveKey,
-          baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
-        })
-      : defaultClient;
 
     const prompt = `You are an expert sales call quality assurance auditor.
 Evaluate the call transcript against the provided QA Framework.
@@ -234,6 +227,58 @@ Strict instructions:
 6. Provide concise strengths (max 10), improvements (max 10), recommendations (max 10), and an overall summary (max 1000 chars).
 7. Do not infer roles without evidence.
 `;
+
+    if (isGemini) {
+      const geminiPrompt = `${prompt}
+Return a valid JSON object strictly matching this schema:
+{
+  "requirements_results": [
+    {
+      "requirement_id": "string",
+      "stage_id": "string",
+      "requirement_text": "string",
+      "status": "PASS" | "PARTIAL" | "FAIL" | "NOT_APPLICABLE",
+      "evidence": "direct quote or empty string if FAIL",
+      "timestamp": "MM:SS or empty string",
+      "explanation": "string explaining the assessment"
+    }
+  ],
+  "strengths": ["string"],
+  "improvements": ["string"],
+  "recommendations": ["string"],
+  "summary": "overall summary string"
+}`;
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${effectiveKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: geminiPrompt }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+            },
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Gemini evaluation failed: ${errText}`);
+      }
+
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        throw new Error("Empty evaluation from Gemini.");
+      }
+
+      const parsed = JSON.parse(text);
+      return validateEvaluationDraft(input.stages, parsed);
+    }
+
+    const client = defaultClient;
 
     const response = await client.chat.completions.create({
       model: input.model ?? "gpt-4o-mini",
