@@ -13,11 +13,14 @@ import {
   CheckCircle2,
   AlertTriangle,
   Layers,
+  Sparkles,
+  UploadCloud,
 } from "lucide-react";
 import type { CallFramework, Stage } from "@/types/database";
 import {
   createFrameworkAction,
   updateFrameworkAction,
+  generateFrameworkFromDocAction,
 } from "@/app/actions/frameworks";
 
 interface FrameworkEditorProps {
@@ -28,6 +31,9 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
+  const [docSuccessMessage, setDocSuccessMessage] = useState<string | null>(null);
 
   const isEditing = Boolean(initialFramework);
 
@@ -87,6 +93,37 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
   // Calculate total weight
   const totalWeight = stages.reduce((acc, s) => acc + (Number(s.weight) || 0), 0);
   const isWeightValid = totalWeight === 100;
+
+  async function handleDocUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsGeneratingDoc(true);
+    setError(null);
+    setDocSuccessMessage(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await generateFrameworkFromDocAction(formData);
+      if (res.success && res.data) {
+        setName(res.data.name);
+        setDescription(res.data.description);
+        setStages(res.data.stages);
+        setDocSuccessMessage(
+          `AI successfully extracted "${res.data.name}" with ${res.data.stages.length} stages from ${file.name}! Review and save below.`
+        );
+      } else {
+        setError(res.error || "Failed to parse document.");
+      }
+    } catch {
+      setError("An unexpected error occurred while analyzing the document.");
+    } finally {
+      setIsGeneratingDoc(false);
+      e.target.value = "";
+    }
+  }
 
   function handleAddStage() {
     const newStage: Stage = {
@@ -246,13 +283,76 @@ export function FrameworkEditor({ initialFramework }: FrameworkEditorProps) {
           </Link>
           <button
             type="submit"
-            disabled={isPending}
+            disabled={isPending || isGeneratingDoc}
             className="inline-flex items-center gap-1.5 px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-md shadow-blue-600/30 disabled:opacity-50"
           >
             {isPending && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {isEditing ? "Update Framework" : "Save Framework"}
           </button>
         </div>
+      </div>
+
+      {/* AI Document Import Card */}
+      <div className="bg-gradient-to-r from-[#131e32] to-[#17253d] border border-blue-500/30 rounded-2xl p-5 shadow-md relative overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3.5">
+            <div className="h-10 w-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 shrink-0 mt-0.5">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-white">
+                  Import Sales Script or Playbook (.docx, .doc, .txt)
+                </h3>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                  AI Auto-Setup
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">
+                Upload your Word document (.docx) or script text. AI will read it, isolate sequential stages, calculate 100% weighted scores, and generate checklist requirements.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="docx-upload"
+              className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold cursor-pointer transition-all shadow-md ${
+                isGeneratingDoc
+                  ? "bg-blue-800 text-blue-200 cursor-not-allowed opacity-75"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/30"
+              }`}
+            >
+              {isGeneratingDoc ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Analyzing with AI...
+                </>
+              ) : (
+                <>
+                  <UploadCloud className="h-4 w-4" />
+                  Upload .docx Script
+                </>
+              )}
+              <input
+                id="docx-upload"
+                type="file"
+                accept=".docx,.doc,.txt,.md"
+                onChange={handleDocUpload}
+                disabled={isGeneratingDoc || isPending}
+                className="sr-only"
+              />
+            </label>
+          </div>
+        </div>
+
+        {/* AI Success Feedback Banner */}
+        {docSuccessMessage && (
+          <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-2.5 text-xs text-emerald-400 font-medium animate-in fade-in duration-200">
+            <CheckCircle2 className="h-4 w-4 shrink-0" />
+            <span>{docSuccessMessage}</span>
+          </div>
+        )}
       </div>
 
       {/* Error Alert */}
