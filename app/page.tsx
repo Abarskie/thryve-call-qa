@@ -11,7 +11,6 @@ import {
   Users,
   ShieldAlert,
   Clock,
-  GitFork,
   ChevronRight,
 } from "lucide-react";
 
@@ -68,14 +67,6 @@ export default async function Home() {
             </div>
 
             <div className="flex items-center gap-2.5">
-              <Link
-                href="/frameworks"
-                prefetch={true}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#131e32] hover:bg-[#182338] text-slate-300 hover:text-white border border-[#1e2e4a] transition-all"
-              >
-                <GitFork className="h-3.5 w-3.5 text-slate-400" />
-                Frameworks
-              </Link>
               <Link
                 href="/calls/upload"
                 prefetch={true}

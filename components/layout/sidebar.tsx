@@ -11,7 +11,6 @@ import {
   Settings,
   Menu,
   X,
-  FileAudio,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -97,18 +96,6 @@ export function Sidebar() {
           >
             <X className="h-4 w-4" />
           </button>
-        </div>
-
-        {/* Quick Action in Sidebar */}
-        <div className="p-3.5 pb-1">
-          <Link
-            href="/calls/upload"
-            prefetch={true}
-            className="w-full flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/25 transition-all"
-          >
-            <FileAudio className="h-4 w-4" />
-            Upload Recording
-          </Link>
         </div>
 
         {/* Navigation Items */}
