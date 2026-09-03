@@ -25,10 +25,16 @@ The platform allows businesses to define required call structures, upload agent 
    - `docs/UI_DESIGN.md`
 3. **Inspect Codebase & Plan**:
    - Always inspect the existing code and obtain approval for implementation plans before coding.
+4. **Strict Prompt Scope (DO NOT INVENT / NO UNPROMPTED CHANGES)**:
+   - **Do ONLY what is specifically requested in the user's prompt.**
+   - **NEVER touch, modify, redesign, or add extra code, UI elements, or features that were not explicitly requested.**
+   - **Do NOT invent anything** (no unsolicited UI overhauls, no extra buttons, no unrequested styling changes, no scope creep).
+   - Preserve all existing code, design, layout, and functionality untouched unless explicitly asked to modify it.
 
 ## Development Rules
 
 - **Superpowers First**: Always load and adhere to the relevant Superpowers skill before touching code or proposing solutions.
+- **Strict Prompt Fidelity**: Only touch and change what the user explicitly requested. Never invent new code, features, or design changes beyond the prompt.
 - Plan features before implementing them.
 - Do not implement features outside the MVP unless explicitly requested.
 - Prefer simple architecture over premature abstraction.
