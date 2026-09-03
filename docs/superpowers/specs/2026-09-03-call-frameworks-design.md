@@ -40,3 +40,4 @@ Allow sales managers to view, create, edit, duplicate, and deactivate reusable m
 - Create, update, duplicate, and toggle frameworks via automated test script.
 - Verify `tsc --noEmit`, `npm run lint`, and `npm run build` pass cleanly.
 - Verify both `/frameworks`, `/frameworks/new`, and `/frameworks/[id]` render correctly in the browser.
+

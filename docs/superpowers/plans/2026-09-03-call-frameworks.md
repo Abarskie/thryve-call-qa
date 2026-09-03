@@ -35,3 +35,4 @@
 - Create `scripts/verify-frameworks-crud.ts` to test create, update, duplicate, and toggle status.
 - Run `npm run lint`, `npx tsc --noEmit`, and `npm run build`.
 - Verify pages load cleanly locally.
+
