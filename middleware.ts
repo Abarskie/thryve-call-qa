@@ -10,44 +10,54 @@ export async function middleware(request: NextRequest) {
   const url = getSupabaseServerUrl();
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-  const supabase = createServerClient(url, key, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) =>
-          request.cookies.set(name, value)
-        );
-        supabaseResponse = NextResponse.next({
-          request,
-        });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options)
-        );
-      },
-    },
-  });
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const pathname = request.nextUrl.pathname;
-
-  const isAuthRoute = pathname === "/login" || pathname === "/signup";
-  const isApiRoute = pathname.startsWith("/api/");
-
-  if (!user && !isAuthRoute && !isApiRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    return NextResponse.redirect(redirectUrl);
+  // If Supabase credentials are missing or set to placeholder, bypass middleware gracefully
+  if (!key || key.trim() === "" || key === "placeholder" || url.includes("placeholder")) {
+    return supabaseResponse;
   }
 
-  if (user && isAuthRoute) {
-    const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/";
-    return NextResponse.redirect(redirectUrl);
+  try {
+    const supabase = createServerClient(url, key, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          supabaseResponse = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          );
+        },
+      },
+    });
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const pathname = request.nextUrl.pathname;
+
+    const isAuthRoute = pathname === "/login" || pathname === "/signup";
+    const isApiRoute = pathname.startsWith("/api/");
+
+    if (!user && !isAuthRoute && !isApiRoute) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/login";
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    if (user && isAuthRoute) {
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/";
+      return NextResponse.redirect(redirectUrl);
+    }
+  } catch (error) {
+    console.error("Middleware auth check failed:", error);
+    return supabaseResponse;
   }
 
   return supabaseResponse;
