@@ -15,7 +15,7 @@ export default async function CallUploadPage() {
   const frameworks = frameworksRes.data?.filter((f) => f.active) || [];
 
   return (
-    <div className="flex min-h-screen bg-neutral-100 text-neutral-800">
+    <div className="flex min-h-screen bg-[#0b1320] text-slate-100">
       <Sidebar />
 
       <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
@@ -23,24 +23,24 @@ export default async function CallUploadPage() {
           <div className="flex items-center gap-3">
             <Link 
               href="/calls"
-              className="p-2.5 rounded-xl border border-neutral-200 bg-white text-neutral-600 hover:text-neutral-900 hover:bg-neutral-50 transition-colors shadow-2xs"
+              className="p-2.5 rounded-xl border border-[#1e2e4a] bg-[#131e32] text-slate-400 hover:text-white hover:bg-[#182338] transition-colors shadow-sm"
               aria-label="Back to Calls"
             >
               <ArrowLeft className="h-4 w-4" />
             </Link>
             <div>
-              <h1 className="text-xl font-bold text-neutral-900 tracking-tight">Upload Call Audio</h1>
-              <p className="text-xs text-neutral-500">Ingest recording for AI transcription & QA analysis</p>
+              <h1 className="text-xl font-bold text-white tracking-tight">Upload Call Audio</h1>
+              <p className="text-xs text-slate-400">Ingest recording for AI transcription & QA analysis</p>
             </div>
           </div>
 
           <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl border border-neutral-200/90 shadow-xs overflow-hidden">
-              <div className="px-6 py-5 border-b border-neutral-100">
-                <h2 className="text-base font-bold text-neutral-900">
+            <div className="bg-[#131e32] rounded-2xl border border-[#1e2e4a] shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-[#1e2e4a]">
+                <h2 className="text-base font-bold text-white">
                   New Call QA Review
                 </h2>
-                <p className="text-xs text-neutral-500 mt-1 leading-relaxed">
+                <p className="text-xs text-slate-400 mt-1 leading-relaxed">
                   Upload an audio file to automatically transcribe dialogue, evaluate compliance against your chosen framework, and produce coaching feedback.
                 </p>
               </div>

@@ -65,24 +65,24 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 text-neutral-800">
+    <form onSubmit={handleSubmit} className="space-y-6 text-slate-200">
       {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
-          <p className="text-xs font-semibold text-rose-700">{error}</p>
+        <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-rose-400 shrink-0 mt-0.5" />
+          <p className="text-xs font-semibold text-rose-400">{error}</p>
         </div>
       )}
 
       <div className="space-y-4">
         <div>
-          <label htmlFor="agentId" className="block text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-1.5">
+          <label htmlFor="agentId" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
             Select Sales Agent *
           </label>
           <select
             id="agentId"
             value={agentId}
             onChange={(e) => setAgentId(e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white focus:bg-white border border-neutral-200 rounded-xl text-neutral-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+            className="w-full px-3.5 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
             required
             disabled={isUploading}
           >
@@ -96,14 +96,14 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         </div>
 
         <div>
-          <label htmlFor="frameworkId" className="block text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-1.5">
+          <label htmlFor="frameworkId" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
             Evaluation Framework *
           </label>
           <select
             id="frameworkId"
             value={frameworkId}
             onChange={(e) => setFrameworkId(e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-neutral-50 hover:bg-white focus:bg-white border border-neutral-200 rounded-xl text-neutral-800 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition-all"
+            className="w-full px-3.5 py-2.5 bg-[#0e1726] border border-[#1e2e4a] rounded-xl text-white text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all"
             required
             disabled={isUploading}
           >
@@ -117,39 +117,39 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-1.5">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
             Audio Recording File *
           </label>
-          <div className="mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-neutral-200 border-dashed rounded-2xl hover:border-neutral-300 transition-colors bg-neutral-50/50">
+          <div className="mt-1 flex justify-center px-6 pt-6 pb-6 border-2 border-[#1e2e4a] border-dashed rounded-2xl hover:border-slate-600 transition-colors bg-[#0e1726]/50">
             <div className="space-y-2 text-center w-full">
               {file ? (
-                <div className="flex flex-col items-center gap-2 p-4 bg-white rounded-xl border border-neutral-200 shadow-xs">
-                  <div className="h-12 w-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-1">
+                <div className="flex flex-col items-center gap-2 p-4 bg-[#182338] rounded-xl border border-[#1e2e4a] shadow-sm">
+                  <div className="h-12 w-12 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center justify-center mb-1">
                     <FileAudio className="h-6 w-6" />
                   </div>
-                  <div className="text-sm font-bold text-neutral-900 flex items-center gap-1.5">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                     {file.name}
                   </div>
-                  <div className="text-xs text-neutral-400 font-medium">
+                  <div className="text-xs text-slate-400 font-medium">
                     {(file.size / (1024 * 1024)).toFixed(2)} MB
                   </div>
                   <button
                     type="button"
                     onClick={() => setFile(null)}
                     disabled={isUploading}
-                    className="mt-2 text-xs font-semibold text-rose-600 hover:text-rose-700 transition-colors"
+                    className="mt-2 text-xs font-semibold text-rose-400 hover:text-rose-300 transition-colors"
                   >
                     Remove selected file
                   </button>
                 </div>
               ) : (
                 <>
-                  <UploadCloud className="mx-auto h-10 w-10 text-neutral-400" />
-                  <div className="flex text-xs text-neutral-600 justify-center items-center gap-1">
+                  <UploadCloud className="mx-auto h-10 w-10 text-slate-500" />
+                  <div className="flex text-xs text-slate-300 justify-center items-center gap-1">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-lg font-semibold text-indigo-600 hover:text-indigo-700 focus-within:outline-none focus-within:underline"
+                      className="relative cursor-pointer rounded-lg font-semibold text-blue-400 hover:text-blue-300 focus-within:outline-none focus-within:underline"
                     >
                       <span>Choose recording</span>
                       <input
@@ -164,7 +164,7 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
                     </label>
                     <span>or drag and drop here</span>
                   </div>
-                  <p className="text-[11px] text-neutral-400">
+                  <p className="text-[11px] text-slate-500">
                     MP3, WAV, or M4A up to 25 MB
                   </p>
                 </>
@@ -178,7 +178,7 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         <button
           type="submit"
           disabled={!file || !agentId || !frameworkId || isUploading}
-          className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-xs font-semibold shadow-xs shadow-indigo-100 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-semibold shadow-md shadow-blue-600/30 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isUploading ? (
             <>
