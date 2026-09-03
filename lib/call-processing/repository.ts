@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatUnknownError } from "@/lib/errors";
-import type { CallStatus, Stage } from "@/types/database";
+import type { CallStatus, Stage, Json } from "@/types/database";
 import type {
   ProcessingCall,
   TranscriptionResult,
@@ -184,7 +184,7 @@ export function createCallProcessingRepository(): CallProcessingRepository {
           {
             call_id: callId,
             raw_text: transcript.text,
-            segments: transcript.segments as unknown as any,
+            segments: transcript.segments as unknown as Json,
           },
           { onConflict: "call_id" }
         );
@@ -232,11 +232,11 @@ export function createCallProcessingRepository(): CallProcessingRepository {
           {
             call_id: callId,
             overall_score: analysis.overall_score,
-            stage_scores: analysis.stage_scores as unknown as any,
-            requirements_results: analysis.requirements_results as unknown as any,
-            strengths: analysis.strengths as unknown as any,
-            improvements: analysis.improvements as unknown as any,
-            recommendations: analysis.recommendations as unknown as any,
+            stage_scores: analysis.stage_scores as unknown as Json,
+            requirements_results: analysis.requirements_results as unknown as Json,
+            strengths: analysis.strengths as unknown as Json,
+            improvements: analysis.improvements as unknown as Json,
+            recommendations: analysis.recommendations as unknown as Json,
             summary: analysis.summary,
           },
           { onConflict: "call_id" }

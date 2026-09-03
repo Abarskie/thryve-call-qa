@@ -1,7 +1,6 @@
 import OpenAI from "openai";
 import type { Stage, RequirementResult, RequirementStatus } from "@/types/database";
 import type {
-  EvaluationDraft,
   ValidatedEvaluation,
   TranscriptionResult,
 } from "./types";

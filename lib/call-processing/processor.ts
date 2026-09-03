@@ -1,0 +1,110 @@
+import { getSettingsAction } from "@/app/actions/settings";
+import {
+  type CallProcessingRepository,
+  createCallProcessingRepository,
+} from "./repository";
+import { type Transcriber, createOpenAITranscriber } from "./transcription";
+import { type Evaluator, createOpenAIEvaluator } from "./evaluation";
+import type { ProcessCallResult } from "./types";
+
+export interface ProcessCallInput {
+  callId: string;
+  retry: boolean;
+}
+
+export interface ProcessorDependencies {
+  apiKey: string;
+  evaluationModel: "gpt-4o-mini" | "gpt-4o";
+  repository: CallProcessingRepository;
+  transcriber: Transcriber;
+  evaluator: Evaluator;
+  now: () => Date;
+}
+
+export async function processCall(
+  input: ProcessCallInput,
+  dependencies?: ProcessorDependencies
+): Promise<ProcessCallResult> {
+  const apiKey = dependencies?.apiKey ?? (process.env.OPENAI_API_KEY || "");
+
+  if (!apiKey || apiKey.trim().length === 0) {
+    return {
+      outcome: "not_configured",
+      message: "OpenAI is not configured.",
+    };
+  }
+
+  let evaluationModel = dependencies?.evaluationModel;
+  if (!evaluationModel) {
+    const settings = await getSettingsAction();
+    evaluationModel = settings.data?.defaultModel ?? "gpt-4o-mini";
+  }
+
+  const repository =
+    dependencies?.repository ?? createCallProcessingRepository();
+  const transcriber =
+    dependencies?.transcriber ?? createOpenAITranscriber(apiKey);
+  const evaluator =
+    dependencies?.evaluator ?? createOpenAIEvaluator(apiKey);
+  const now = dependencies?.now ?? (() => new Date());
+
+  const claimResult = await repository.claim(input.callId, input.retry, now());
+  if (claimResult.outcome !== "claimed") {
+    return { outcome: claimResult.outcome };
+  }
+
+  const call = claimResult.call;
+  let currentStage: "download" | "transcribe" | "evaluation" | "persistence" =
+    "download";
+
+  try {
+    currentStage = "download";
+    const audio = await repository.downloadAudio(call);
+
+    currentStage = "transcribe";
+    const transcript = await transcriber(audio);
+
+    currentStage = "persistence";
+    await repository.saveTranscript(input.callId, transcript);
+    await repository.markAnalyzing(input.callId);
+
+    currentStage = "evaluation";
+    const analysis = await evaluator({
+      agentName: call.agentName,
+      frameworkName: call.frameworkName,
+      stages: call.stages,
+      transcript,
+      model: evaluationModel,
+    });
+
+    currentStage = "persistence";
+    await repository.saveAnalysis(input.callId, analysis);
+    await repository.markCompleted(input.callId, transcript.durationSeconds);
+
+    return { outcome: "completed" };
+  } catch (err: unknown) {
+    let safeMessage = "Processing failed. Please retry processing.";
+    if (currentStage === "download") {
+      safeMessage = "The uploaded recording could not be read. Please retry processing.";
+    } else if (currentStage === "transcribe") {
+      safeMessage = "Audio transcription failed. Please retry processing.";
+    } else if (currentStage === "evaluation") {
+      safeMessage = "Call evaluation failed. Please retry processing.";
+    } else if (currentStage === "persistence") {
+      safeMessage = "The processing result could not be saved. Please retry processing.";
+    }
+
+    console.error(`Call processing failed [callId=${input.callId}, stage=${currentStage}]:`, err);
+
+    try {
+      await repository.markFailed(input.callId, safeMessage);
+    } catch (persistErr) {
+      console.error(`Failed to mark call failed [callId=${input.callId}]:`, persistErr);
+    }
+
+    return {
+      outcome: "failed",
+      message: safeMessage,
+    };
+  }
+}
