@@ -1,6 +1,8 @@
 import { SettingsForm } from "@/components/settings/settings-form";
 import { getSettingsAction } from "@/app/actions/settings";
 
+export const dynamic = "force-dynamic";
+
 export default async function SettingsPage() {
   const { data: initialSettings } = await getSettingsAction();
 
