@@ -12,6 +12,8 @@ import {
   Plus,
   ChevronRight,
   Filter,
+  XCircle,
+  Loader2,
 } from "lucide-react";
 import type { DashboardCall } from "@/app/actions/calls";
 
@@ -20,16 +22,42 @@ interface CallsDirectoryProps {
 }
 
 export function CallsDirectory({ initialCalls }: CallsDirectoryProps) {
+  const [calls, setCalls] = useState<DashboardCall[]>(initialCalls);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [stoppingId, setStoppingId] = useState<string | null>(null);
 
-  const filteredCalls = initialCalls.filter((call) => {
+  const handleStop = async (callId: string) => {
+    setStoppingId(callId);
+    try {
+      const res = await fetch(`/api/calls/${callId}/stop`, {
+        method: "POST",
+      });
+      if (res.ok) {
+        setCalls((prev) =>
+          prev.map((c) =>
+            c.id === callId ? { ...c, status: "FAIL" } : c
+          )
+        );
+      }
+    } catch (err) {
+      console.error("Failed to stop audit:", err);
+    } finally {
+      setStoppingId(null);
+    }
+  };
+
+  const filteredCalls = calls.filter((call) => {
     const matchesSearch =
       call.agentName.toLowerCase().includes(search.toLowerCase()) ||
       call.frameworkName.toLowerCase().includes(search.toLowerCase());
 
     const matchesStatus =
-      statusFilter === "ALL" ? true : call.status === statusFilter;
+      statusFilter === "ALL"
+        ? true
+        : statusFilter === "FAIL"
+        ? call.status === "FAIL" || call.status === "FAILED"
+        : call.status === statusFilter;
 
     return matchesSearch && matchesStatus;
   });
@@ -160,7 +188,7 @@ export function CallsDirectory({ initialCalls }: CallsDirectoryProps) {
                             ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                             : call.status === "PARTIAL"
                             ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                            : call.status === "FAIL"
+                            : call.status === "FAIL" || call.status === "FAILED"
                             ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
                             : "bg-blue-500/10 text-blue-400 border border-blue-500/20"
                         }`}
@@ -171,7 +199,7 @@ export function CallsDirectory({ initialCalls }: CallsDirectoryProps) {
                         {call.status === "PARTIAL" && (
                           <AlertCircle className="h-3 w-3 text-amber-400" />
                         )}
-                        {call.status === "FAIL" && (
+                        {(call.status === "FAIL" || call.status === "FAILED") && (
                           <ShieldAlert className="h-3 w-3 text-rose-400" />
                         )}
                         {call.status === "PENDING" && (
@@ -181,13 +209,35 @@ export function CallsDirectory({ initialCalls }: CallsDirectoryProps) {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <Link
-                        href={`/calls/${call.id}`}
-                        className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 group-hover:text-blue-400 transition-colors"
-                      >
-                        Details
-                        <ChevronRight className="h-3.5 w-3.5" />
-                      </Link>
+                      <div className="flex items-center justify-end gap-3">
+                        {call.status === "PENDING" && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleStop(call.id);
+                            }}
+                            disabled={stoppingId === call.id}
+                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-400 hover:text-rose-300 transition-colors disabled:opacity-50"
+                            title="Stop call audit"
+                          >
+                            {stoppingId === call.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <XCircle className="h-3 w-3" />
+                            )}
+                            Stop Audit
+                          </button>
+                        )}
+                        <Link
+                          href={`/calls/${call.id}`}
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 group-hover:text-blue-400 transition-colors"
+                        >
+                          Details
+                          <ChevronRight className="h-3.5 w-3.5" />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

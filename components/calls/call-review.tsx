@@ -64,6 +64,13 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
     setIsStopping(true);
     setRequestError(null);
 
+    const prevCall = call;
+    setCall((prev) => ({
+      ...prev,
+      status: "failed",
+      errorMessage: "Processing cancelled by user.",
+    }));
+
     try {
       const res = await fetch(`/api/calls/${call.id}/stop`, {
         method: "POST",
@@ -73,11 +80,13 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
       const json = await res.json();
 
       if (!res.ok) {
+        setCall(prevCall);
         setRequestError(json.message || json.error || "Failed to stop processing.");
       } else {
         await pollStatus();
       }
     } catch {
+      setCall(prevCall);
       setRequestError("Network error while stopping processing.");
     } finally {
       setIsStopping(false);
