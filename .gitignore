@@ -37,5 +37,5 @@ next-env.d.ts
 # ide and internal tools
 .vscode
 .superpowers
-
+.worktrees
 

@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { validateAudioUploadFile } from "@/lib/audio-upload";
+import { formatUnknownError } from "@/lib/errors";
 import type { CallStatus } from "@/types/database";
 
 export interface DashboardCall {
@@ -25,12 +27,17 @@ export interface DashboardData {
  */
 export async function uploadCallAction(formData: FormData) {
   try {
-    const file = formData.get("file") as File;
-    const agentId = formData.get("agentId") as string;
-    const frameworkId = formData.get("frameworkId") as string;
+    const file = formData.get("file");
+    const agentId = formData.get("agentId");
+    const frameworkId = formData.get("frameworkId");
 
-    if (!file || !agentId || !frameworkId) {
+    if (!(file instanceof File) || typeof agentId !== "string" || typeof frameworkId !== "string" || !agentId || !frameworkId) {
       return { success: false, error: "Missing required fields." };
+    }
+
+    const validationError = validateAudioUploadFile(file);
+    if (validationError) {
+      return { success: false, error: validationError };
     }
 
     const supabase = createAdminClient();
@@ -82,8 +89,9 @@ export async function uploadCallAction(formData: FormData) {
 
     return { success: true, data: callRecord };
   } catch (err: unknown) {
-    console.error("Upload call exception:", err);
-    return { success: false, error: err instanceof Error ? err.message : "An unexpected error occurred." };
+    const message = formatUnknownError(err, "An unexpected error occurred during upload.");
+    console.error(`Upload call exception: ${message}`);
+    return { success: false, error: message };
   }
 }
 
@@ -180,10 +188,11 @@ export async function getDashboardDataAction(): Promise<{
       },
     };
   } catch (err: unknown) {
-    console.error("Error fetching dashboard data:", err);
+    const message = formatUnknownError(err, "Failed to load dashboard data");
+    console.error(`Error fetching dashboard data: ${message}`);
     return {
       success: false,
-      error: err instanceof Error ? err.message : "Failed to load dashboard data",
+      error: message,
       data: {
         totalCalls: 0,
         activeAgents: 0,

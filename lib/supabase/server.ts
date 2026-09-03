@@ -1,13 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import type { Database } from '@/types/database'
+import { getSupabaseServerUrl } from '@/lib/supabase/url'
 
 /**
  * Creates a Supabase client for use in Server Components, Server Actions, and Route Handlers.
  */
 export async function createClient() {
   const cookieStore = await cookies()
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+  const url = getSupabaseServerUrl()
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
 
   return createServerClient<Database>(

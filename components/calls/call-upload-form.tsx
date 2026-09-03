@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadCallAction } from "@/app/actions/calls";
+import { validateAudioUploadFile } from "@/lib/audio-upload";
 import { Loader2, UploadCloud, FileAudio, AlertCircle, CheckCircle2 } from "lucide-react";
 import type { Agent, CallFramework } from "@/types/database";
 
@@ -22,10 +23,10 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
-      const validTypes = ["audio/mpeg", "audio/wav", "audio/x-m4a", "audio/mp4", "audio/mp3"];
-      
-      if (!validTypes.includes(selectedFile.type) && !selectedFile.name.match(/\.(mp3|wav|m4a)$/i)) {
-        setError("Please select a valid audio file (.mp3, .wav, .m4a)");
+      const validationError = validateAudioUploadFile(selectedFile);
+
+      if (validationError) {
+        setError(validationError);
         setFile(null);
         return;
       }
@@ -58,8 +59,8 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
         setError(result.error || "Failed to upload.");
         setIsUploading(false);
       }
-    } catch {
-      setError("An unexpected error occurred during upload.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred during upload.");
       setIsUploading(false);
     }
   };
