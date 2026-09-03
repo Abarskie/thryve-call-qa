@@ -124,3 +124,4 @@ test("polls only healthy active calls", () => {
   assert.equal(shouldPollCall(staleCall, new Date(NOW)), false);
   assert.equal(shouldPollCall(completedCall, new Date(NOW)), false);
 });
+

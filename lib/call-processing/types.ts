@@ -39,3 +39,4 @@ export interface ProcessingCall {
 export type ProcessCallResult =
   | { outcome: "completed" | "already_completed" | "already_processing" | "retry_required" | "not_found" }
   | { outcome: "not_configured" | "failed"; message: string };
+

@@ -296,3 +296,4 @@ The initial migration (`20260903000001_initial_schema.sql`) automatically provis
    - **Stage 5: Objection Handling** (15% weight) - 3 requirements
    - **Stage 6: Close** (15% weight) - 2 requirements
    - *Total Weight: 100%*
+

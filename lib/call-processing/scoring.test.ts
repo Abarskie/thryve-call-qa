@@ -98,3 +98,4 @@ test("marks only active records older than fifteen minutes stale", () => {
   assert.equal(isStaleCall("analyzing", "2026-09-04T00:45:00.000Z", now), false);
   assert.equal(isStaleCall("pending", "2026-09-03T00:00:00.000Z", now), false);
 });
+

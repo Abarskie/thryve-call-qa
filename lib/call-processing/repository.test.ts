@@ -26,3 +26,4 @@ test("requires explicit retry for failed and stale active calls", () => {
   assert.equal(getClaimEligibility("transcribing", true, true), "claim");
   assert.equal(getClaimEligibility("completed", false, false), "already_completed");
 });
+
