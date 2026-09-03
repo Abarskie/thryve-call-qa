@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getCallReviewData } from "@/lib/call-processing/query";
+import { getSettingsAction } from "@/app/actions/settings";
 import { CallReview } from "@/components/calls/call-review";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,9 @@ export default async function CallPage({ params }: CallPageProps) {
   if (!call) {
     notFound();
   }
+
+  const settingsRes = await getSettingsAction();
+  const passingThreshold = settingsRes.data?.passingThreshold ?? 75;
 
   return (
     <div className="flex min-h-screen bg-[#0b1320] text-slate-100">
@@ -38,7 +42,11 @@ export default async function CallPage({ params }: CallPageProps) {
             </div>
           </div>
 
-          <CallReview initialCall={call} now={new Date().toISOString()} />
+          <CallReview
+            initialCall={call}
+            now={new Date().toISOString()}
+            passingThreshold={passingThreshold}
+          />
         </div>
       </main>
     </div>

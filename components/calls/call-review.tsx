@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import type { CallReviewData } from "@/lib/call-processing/query";
 import { isStaleCall } from "@/lib/call-processing/scoring";
 import { CallReport } from "./call-report";
@@ -9,11 +10,13 @@ import {
   AlertCircle,
   RefreshCw,
   XCircle,
+  Settings,
 } from "lucide-react";
 
 interface CallReviewProps {
   initialCall: CallReviewData;
   now?: string;
+  passingThreshold?: number;
 }
 
 export function shouldPollCall(call: CallReviewData, now: Date): boolean {
@@ -26,7 +29,11 @@ export function shouldPollCall(call: CallReviewData, now: Date): boolean {
   return true;
 }
 
-export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
+export function CallReview({
+  initialCall,
+  now: initialNow,
+  passingThreshold = 75,
+}: CallReviewProps) {
   const [call, setCall] = useState<CallReviewData>(initialCall);
   const [requestError, setRequestError] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
@@ -159,7 +166,7 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
 
   // If completed and has analysis, render full report
   if (call.status === "completed" && call.analysis) {
-    return <CallReport call={call} />;
+    return <CallReport call={call} passingThreshold={passingThreshold} />;
   }
 
   // Active / Processing / Failed / Stale State Card
@@ -211,7 +218,7 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
               </p>
             )}
 
-            <div className="pt-2">
+            <div className="pt-2 flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={handleRetry}
@@ -225,6 +232,18 @@ export function CallReview({ initialCall, now: initialNow }: CallReviewProps) {
                 )}
                 Retry processing
               </button>
+
+              {(call.errorMessage?.toLowerCase().includes("key") ||
+                call.errorMessage?.toLowerCase().includes("configured") ||
+                requestError?.toLowerCase().includes("configured")) && (
+                <Link
+                  href="/settings"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#182338] hover:bg-[#202f4a] text-blue-400 border border-blue-500/30 transition-all"
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                  Configure API Key
+                </Link>
+              )}
             </div>
           </div>
         ) : (

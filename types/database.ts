@@ -390,6 +390,42 @@ export interface Database {
           }
         ]
       }
+      workspace_settings: {
+        Row: {
+          id: string
+          company_name: string
+          manager_email: string
+          default_model: string
+          passing_threshold: number
+          openai_api_key: string | null
+          gemini_api_key: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_name?: string
+          manager_email?: string
+          default_model?: string
+          passing_threshold?: number
+          openai_api_key?: string | null
+          gemini_api_key?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_name?: string
+          manager_email?: string
+          default_model?: string
+          passing_threshold?: number
+          openai_api_key?: string | null
+          gemini_api_key?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

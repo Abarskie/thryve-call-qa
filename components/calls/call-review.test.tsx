@@ -16,6 +16,7 @@ const baseCall: CallReviewData = {
   updatedAt: "2026-09-04T00:50:00.000Z",
   fileName: "recording.mp3",
   durationSeconds: 120,
+  audioUrl: "/api/calls/call-1/audio",
   agent: { id: "agent-1", name: "Alex Miller" },
   framework: {
     id: "fw-1",

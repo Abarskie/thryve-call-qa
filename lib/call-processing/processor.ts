@@ -1,4 +1,4 @@
-import { getSettingsAction } from "@/app/actions/settings";
+import { getRawWorkspaceSettings } from "@/app/actions/settings";
 import {
   type CallProcessingRepository,
   createCallProcessingRepository,
@@ -30,15 +30,20 @@ export async function processCall(
   input: ProcessCallInput,
   dependencies?: ProcessorDependencies
 ): Promise<ProcessCallResult> {
-  let evaluationModel = dependencies?.evaluationModel;
-  if (!evaluationModel) {
-    const settings = await getSettingsAction();
-    evaluationModel = settings.data?.defaultModel ?? "gpt-4o-mini";
-  }
+  const rawSettings = await getRawWorkspaceSettings().catch(() => null);
 
-  const apiKey = dependencies?.apiKey ?? (process.env.OPENAI_API_KEY || "");
+  const evaluationModel =
+    dependencies?.evaluationModel ??
+    rawSettings?.defaultModel ??
+    "gpt-4o-mini";
+
+  const apiKey =
+    dependencies?.apiKey ??
+    (rawSettings?.rawOpenaiApiKey || (process.env.OPENAI_API_KEY || ""));
+
   const geminiApiKey =
-    dependencies?.geminiApiKey ?? (process.env.GEMINI_API_KEY || "");
+    dependencies?.geminiApiKey ??
+    (rawSettings?.rawGeminiApiKey || (process.env.GEMINI_API_KEY || ""));
 
   const isGemini = evaluationModel === "gemini-2.0-flash";
 

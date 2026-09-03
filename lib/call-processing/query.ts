@@ -16,6 +16,7 @@ export interface CallReviewData {
   updatedAt: string;
   fileName: string;
   durationSeconds: number;
+  audioUrl: string;
   agent: { id: string; name: string };
   framework: { id: string; name: string; stages: Stage[] };
   transcript: { rawText: string; segments: TranscriptSegment[] } | null;
@@ -110,6 +111,7 @@ export async function getCallReviewData(
     updatedAt: call.updated_at,
     fileName: call.file_name,
     durationSeconds: call.duration_seconds,
+    audioUrl: `/api/calls/${call.id}/audio`,
     agent,
     framework,
     transcript,
