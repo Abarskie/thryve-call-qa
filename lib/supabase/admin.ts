@@ -7,9 +7,14 @@ import { getSupabaseServerUrl } from '@/lib/supabase/url'
  * Bypasses RLS policies - strictly for server-side trusted operations (e.g. webhook handlers, background jobs).
  */
 export function createAdminClient() {
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    'placeholder-service-role-key'
+
   return createClient<Database>(
     getSupabaseServerUrl(),
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    key,
     {
       auth: {
         persistSession: false,

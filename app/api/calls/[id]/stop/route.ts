@@ -4,9 +4,8 @@ import { createCallProcessingRepository } from "@/lib/call-processing/repository
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const repo = createCallProcessingRepository();
-
-export const POST = createStopCallHandler((id, reason) =>
-  repo.markFailed(id, reason)
-);
+export const POST = createStopCallHandler((id, reason) => {
+  const repo = createCallProcessingRepository();
+  return repo.markFailed(id, reason);
+});
 
