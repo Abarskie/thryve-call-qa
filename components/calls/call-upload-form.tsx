@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { uploadCallAction } from "@/app/actions/calls";
 import { validateAudioUploadFile } from "@/lib/audio-upload";
+import { createClient } from "@/lib/supabase/client";
 import {
   Loader2,
   UploadCloud,
@@ -82,15 +83,32 @@ export function CallUploadForm({ agents, frameworks }: CallUploadFormProps) {
     setError(null);
     setUploadStep("Uploading audio recording to secure storage...");
 
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("agentId", agentId);
-    formData.append("frameworkId", frameworkId);
-
     try {
-      setTimeout(() => {
-        setUploadStep("Registering call and queueing AI evaluation pipeline...");
-      }, 1500);
+      const storagePath = `uploads/${crypto.randomUUID()}`;
+      const supabase = createClient();
+      const { error: uploadError } = await supabase.storage
+        .from("call-recordings")
+        .upload(storagePath, file, {
+          contentType: file.type || undefined,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        setError(uploadError.message || "Failed to upload audio file.");
+        setIsUploading(false);
+        setUploadStep(null);
+        return;
+      }
+
+      setUploadStep("Registering call and queueing AI evaluation pipeline...");
+
+      const formData = new FormData();
+      formData.append("storagePath", storagePath);
+      formData.append("fileName", file.name);
+      formData.append("fileSize", String(file.size));
+      formData.append("fileType", file.type);
+      formData.append("agentId", agentId);
+      formData.append("frameworkId", frameworkId);
 
       const result = await uploadCallAction(formData);
       if (result.success && result.data) {

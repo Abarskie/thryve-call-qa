@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { validateAudioUploadFile } from "@/lib/audio-upload";
+import { validateStoredAudioUpload } from "@/lib/audio-upload";
 import { formatUnknownError } from "@/lib/errors";
 import { getStorageObjectPath } from "@/lib/call-processing/repository";
 import { getSettingsAction } from "@/app/actions/settings";
@@ -25,56 +25,61 @@ export interface DashboardData {
 }
 
 /**
- * Uploads a call audio file to Supabase Storage and creates a record in the database.
+ * Creates a call record for an audio file already uploaded to Supabase Storage.
  */
 export async function uploadCallAction(formData: FormData) {
   try {
-    const file = formData.get("file");
+    const storagePath = formData.get("storagePath");
+    const fileName = formData.get("fileName");
+    const fileSizeValue = formData.get("fileSize");
+    const fileType = formData.get("fileType");
     const agentId = formData.get("agentId");
     const frameworkId = formData.get("frameworkId");
 
-    if (!(file instanceof File) || typeof agentId !== "string" || typeof frameworkId !== "string" || !agentId || !frameworkId) {
+    if (
+      typeof storagePath !== "string" ||
+      typeof fileName !== "string" ||
+      typeof fileSizeValue !== "string" ||
+      typeof fileType !== "string" ||
+      typeof agentId !== "string" ||
+      typeof frameworkId !== "string" ||
+      !storagePath ||
+      !fileName ||
+      !agentId ||
+      !frameworkId
+    ) {
       return { success: false, error: "Missing required fields." };
     }
 
-    const validationError = validateAudioUploadFile(file);
+    const fileSize = Number(fileSizeValue);
+    if (!Number.isSafeInteger(fileSize)) {
+      return { success: false, error: "Invalid audio file size." };
+    }
+
+    const validationError = validateStoredAudioUpload({
+      storagePath,
+      fileName,
+      fileSize,
+      fileType,
+    });
     if (validationError) {
       return { success: false, error: validationError };
     }
 
     const supabase = createAdminClient();
 
-    // 1. Generate a unique filename and upload to Storage
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-    const filePath = `uploads/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("call-recordings")
-      .upload(filePath, file, {
-        contentType: file.type,
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
-      return { success: false, error: "Failed to upload audio file." };
-    }
-
-    // 2. Get the public URL for the uploaded file
     const { data: publicUrlData } = supabase.storage
       .from("call-recordings")
-      .getPublicUrl(filePath);
+      .getPublicUrl(storagePath);
 
-    // 3. Create the call record in the database
     const { data: callRecord, error: dbError } = await supabase
       .from("calls")
       .insert({
         agent_id: agentId,
         framework_id: frameworkId,
         audio_url: publicUrlData.publicUrl,
-        file_name: file.name,
-        file_size: file.size,
+        file_name: fileName,
+        file_size: fileSize,
         duration_seconds: 0,
         status: "pending" as CallStatus
       })
